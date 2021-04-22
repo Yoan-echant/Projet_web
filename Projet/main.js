@@ -6,10 +6,10 @@ const session = require('express-session')
 const app = express()
 const bodyParser = require('body-parser');
 const path = require('path');
-const SQLiteStore = require('connect-sqlite3')(session);
+//const SQLiteStore = require('connect-sqlite3')(session);
 const port = 3000
 const sess = {
-  store: new SQLiteStore,
+  //store: new SQLiteStore,
   secret: 'secret key',
   resave: true,
   rolling: true,
@@ -53,14 +53,20 @@ app.post('/login',(req, res) => {
   let data = {
   }
   if(
-    username !== authentification.username ||
+    username !== authentification.username
+  ) {
+    data = {
+      errors: "Le nom d'utilisateur est inconnu",
+      logged: false
+    }
+  } else if(
     password !== authentification.password
   ) {
     data = {
-      errors: "Le login est incorret",
+      errors: "Le mot de passe n'est pas valide",
       logged: false
     }
-  } else {
+  }else {
     req.session.logged = true
     data = {
       success: "Vous êtes log",
