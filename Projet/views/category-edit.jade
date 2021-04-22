@@ -1,0 +1,18 @@
+extends layout
+block body
+    div.container-sm
+        div.row
+            div.col
+                div.header
+                    nav.d-flex.justify-content-between.align-items-center
+                        h3.text-muted.mr-auto.p-2 Blog
+        form(action="/category/" + category.cat_id + "/edit" method="POST")
+            div.row
+                div.col
+                    div.bg-light.p-5
+                        input(value=category.cat_name id="name" name="name")
+            div
+                input(type="Submit" value="Sauvegarder")
+        div.row
+            form(action="/category/" + category.cat_id + "/delete" method="POST")
+                input(type="Submit" value="Delete")
