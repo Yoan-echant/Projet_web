@@ -15,6 +15,16 @@ block body
                             if(logged)
                                 li.nav-item
                                     a.nav-link(href="/categories") Editer categories
+                            if (logged)
+                                li.nav-item
+                                    a.nav-link(href="/post/create") Créer un nouveau post
+                                    
+                            if(!logged)
+                                li.nav-item
+                                    a.nav-link(href="/login") Se connecter
+                            if(!logged)
+                                li.nav-item
+                                    a.nav-link(href="/signup") Créer un compte
         div.row
             div.col
                 div.bg-light.p-5
