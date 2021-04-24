@@ -1,6 +1,6 @@
 const {openDb} = require("./db")
 
-const tablesNames = ["categories","posts"]
+const tablesNames = ["categories","posts","userdata"]
 
 
 
@@ -9,6 +9,22 @@ async function createCategories(db){
   const names = ["Categorie 1", "Categorie 2"]
   return await Promise.all(names.map(cat => {
     return insertRequest.run(cat)
+  }))
+}
+
+async function createUserdata(db){
+  const insertRequest = await db.prepare("INSERT INTO userdata(username,password) VALUES(?, ?)")
+  const data = [{
+    username:"username",
+    password: "password",
+   },
+    {
+     username:"admin",
+     password: "admin",
+    }
+  ]
+  return await Promise.all(data.map(users => {
+    return insertRequest.run([users.username, users.password])
   }))
 }
 
@@ -46,7 +62,14 @@ async function createTables(db){
           FOREIGN KEY(category) REFERENCES categories(cat_id)
         )
   `)
-  return await Promise.all([cat,post])
+  const users = db.run(`
+        CREATE TABLE IF NOT EXISTS userdata(
+          id INTEGER PRIMARY KEY,
+          username varchar(255),
+          password varchar(255)
+        )
+  `)
+  return await Promise.all([cat, post, users])
 }
 
 
@@ -64,4 +87,5 @@ async function dropTables(db){
   await createTables(db)
   await createCategories(db)
   await createPosts(db)
+  await createUserdata(db)
 })()

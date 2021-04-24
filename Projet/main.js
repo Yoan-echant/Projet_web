@@ -75,6 +75,28 @@ app.post('/login',(req, res) => {
   }
   res.render('login',data)
 })
+
+app.post('/signup',(req, res) => {
+  const username = req.body.username
+  const password = req.body.password
+  let data = {
+  }
+  if(
+    username == userdata.username
+  ) {
+    data = {
+      errors: "Le nom d'utilisateur déja utilisé",
+      logged: false
+    }
+  }else {
+    const users =await db.run(`
+      INSERT INTO userdata(username,password)
+      VALUES(?, ?)
+    `,[username, password])
+    res.redirect(302,'/login')
+  }
+})
+
 app.post('/logout',(req, res) => {
   req.session.logged = false
   res.redirect(302,'/login')
