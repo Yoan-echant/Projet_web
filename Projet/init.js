@@ -1,6 +1,6 @@
 const {openDb} = require("./db")
 
-const tablesNames = ["categories","posts","userdata"]
+const tablesNames = ["categories","posts","userdata", "commentaires"]
 
 
 
@@ -46,6 +46,24 @@ async function createPosts(db){
   }))
 }
 
+async function createCommentaire(db){
+  const insertRequest = await db.prepare("INSERT INTO commentaires(name, content, article) VALUES(?, ?, ?)")
+  const commentaire = [{
+    name: "Commentaire 1",
+    content: "Lorem lipsum, Lorem lipsum Lorem lipsum Lorem lipsum",
+    article: 1
+  }, 
+  {
+    name: "Commentaire 2",
+    content: "Lorem lipsum, Lorem lipsum Lorem lipsum Lorem lipsum",
+    article: 2
+  }
+  ]
+  return await Promise.all( commentaire.map(comm => {
+    return insertRequest.run([comm.name, comm.content, comm.article])
+  }))
+}
+
 async function createTables(db){
   const cat = db.run(`
     CREATE TABLE IF NOT EXISTS categories(
@@ -69,7 +87,17 @@ async function createTables(db){
           password varchar(255)
         )
   `)
-  return await Promise.all([cat, post, users])
+
+  const commentaire = db.run(`
+        CREATE TABLE IF NOT EXISTS commentaires(
+          id INTEGER PRIMARY KEY,
+          name varchar(255),
+          content text,
+          article int,
+          FOREIGN KEY(article) REFERENCES post(id)
+        )
+  `)
+  return await Promise.all([cat, post,users, commentaire])
 }
 
 
@@ -80,6 +108,8 @@ async function dropTables(db){
   ))
 }
 
+
+
 (async () => {
   // open the database
   let db = await openDb()
@@ -88,4 +118,5 @@ async function dropTables(db){
   await createCategories(db)
   await createPosts(db)
   await createUserdata(db)
+  await createCommentaire(db)
 })()

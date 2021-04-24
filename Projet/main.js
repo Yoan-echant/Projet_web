@@ -101,6 +101,36 @@ app.post('/logout',(req, res) => {
   req.session.logged = false
   res.redirect(302,'/login')
 })
+app.get('/post/commentaire', async (req, res) => {
+  if(!req.session.logged){
+    res.redirect(302,'/login')
+    return
+  }
+  const db = await openDb()
+
+  const commentaires = await db.all(`
+    SELECT * FROM commentaire
+  `)
+  res.render("post-create",{commentaires: commentaire})
+})
+
+app.post('/post/commentaire/create', async (req, res) => {
+  if(!req.session.logged){
+    res.redirect(302,'/login')
+    return
+  }
+
+  const db = await openDb()
+  const id = req.params.id
+  const name = req.body.commentaire
+  const content = req.body.content
+  const category = req.body.category
+  const commentaire = await db.run(`
+    INSERT INTO commentaire(commentaire,content,category)
+    VALUES(?, ?, ?)
+  `,[name, content, category])
+  res.redirect("/post/")
+})
 
 app.get('/post/create', async (req, res) => {
   if(!req.session.logged){
