@@ -30,6 +30,7 @@ block body
                 div.bg-light.p-5
                     div.container
                         h1.text-center=categoryActive ? categoryActive.cat_name : "Acceuil"
+        
 
         div.row.mt-5
             div.col
@@ -48,3 +49,6 @@ block body
                                         p=posts[indexToSearch].content
                 if posts.length <= 0
                   div.col
+
+         div.row 
+             img( src='./image_reddit.jpg' ) 
