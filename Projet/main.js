@@ -75,33 +75,17 @@ app.post('/login',(req, res) => {
   }
   res.render('login',data)
 })
-
-app.post('/signup',(req, res) => {
-  const username = req.body.username
-  const password = req.body.password
-  let data = {
-  }
-  if(
-    username == userdata.username
-  ) {
-    data = {
-      errors: "Le nom d'utilisateur déja utilisé",
-      logged: false
-    }
-  }else {
-    const users =await db.run(`
-      INSERT INTO userdata(username,password)
-      VALUES(?, ?)
-    `,[username, password])
-    res.redirect(302,'/login')
-  }
-})
-
 app.post('/logout',(req, res) => {
-  req.session.logged = false
+ if (req.session.logged = false){
   res.redirect(302,'/login')
+ }
+ if (req.session.logged = true){
+  res.redirect(302,'/')
+ }
+  
+  
 })
-app.get('/post/commentaire', async (req, res) => {
+app.get('/commentaire', async (req, res) => {
   if(!req.session.logged){
     res.redirect(302,'/login')
     return
@@ -111,10 +95,10 @@ app.get('/post/commentaire', async (req, res) => {
   const commentaires = await db.all(`
     SELECT * FROM commentaire
   `)
-  res.render("post-create",{commentaires: commentaire})
+  res.render("commentaires",{commentaires: commentaire})
 })
 
-app.post('/post/commentaire/create', async (req, res) => {
+app.post('/commentaire/edit', async (req, res) => {
   if(!req.session.logged){
     res.redirect(302,'/login')
     return
@@ -131,7 +115,101 @@ app.post('/post/commentaire/create', async (req, res) => {
   `,[name, content, category])
   res.redirect("/post/")
 })
+/*app.get('/commentaire', async (req, res) => {
+  if(!req.session.logged){
+    res.redirect(302,'/login')
+    return
+  }
+  const db = await openDb()
 
+  const categories = await db.all(`
+    SELECT * FROM commentaires
+  `)
+  res.render("commentaire",{categories: categories})
+})
+
+app.post('/commentaire/edit', async (req, res) => {
+  if(!req.session.logged){
+    res.redirect(302,'/login')
+    return
+  }
+
+  const db = await openDb()
+  const id = req.params.id
+  const name = req.body.name
+  const content = req.body.content
+  const article = req.body.article
+  const commentaire= await db.run(`
+    INSERT INTO commentaire(name,content,article)
+    VALUES(?, ?, ?)
+  `,[name, content, article])
+  res.redirect("/post/" + post.lastID)
+})
+
+app.get('/commentaire/:id', async (req, res) => {
+  const db = await openDb()
+  const id = req.params.id
+  const commentaire = await db.get(`
+    SELECT * FROM posts
+    LEFT JOIN categories on categories.cat_id = commentaire.id
+    WHERE id = ?
+  `,[id])
+  res.render("post",{post: post})
+})
+
+app.get('/post/:id/edit', async (req, res) => {
+  if(!req.session.logged){
+    res.redirect(302,'/login')
+    return
+  }
+
+  const db = await openDb()
+  const id = req.params.id
+  const categories = await db.all(`
+    SELECT * FROM categories
+  `)
+  const post = await db.get(`
+    SELECT * FROM posts
+    LEFT JOIN categories on categories.cat_id = posts.category
+    WHERE id = ?
+  `,[id])
+  res.render("post-edit",{post: post, categories: categories})
+})
+
+app.post('/post/:id/edit', async (req, res) => {
+  if(!req.session.logged){
+    res.redirect(302,'/login')
+    return
+  }
+
+  const db = await openDb()
+  const id = req.params.id
+  const name = req.body.name
+  const content = req.body.content
+  const category = req.body.category
+
+  await db.run(`
+    UPDATE posts
+    SET name = ?, content = ?, category = ?
+    WHERE id = ?
+  `,[name, content, category, id])
+  res.redirect("/post/" + id)
+})
+
+app.post('/post/:id/delete', async (req, res) => {
+  if(!req.session.logged){
+    res.redirect(302,'/login')
+    return
+  }
+
+  const db = await openDb()
+  const id = req.params.id
+  await db.run(`
+    DELETE FROM posts
+    WHERE id = ?
+  `,[id])
+  res.redirect("/")
+})*/
 app.get('/post/create', async (req, res) => {
   if(!req.session.logged){
     res.redirect(302,'/login')

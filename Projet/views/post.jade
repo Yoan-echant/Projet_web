@@ -1,5 +1,4 @@
-extends layout
-extends blog 
+extends layout 
 block body
     div.container-sm
         div.row
@@ -7,15 +6,9 @@ block body
                 div.header
                     nav.d-flex.justify-content-between.align-items-center
                         h3.text-muted.mr-auto.p-2 Blog
-                        ul.nav.nav-pills.justify-content-end
-                            li.nav-item
-                                a.nav-link(href="/" class=!categoryActive ? "active" : "") Acceuil
-                            each cat in categories
-                                li.nav-item
-                                    a.nav-link(href="/"+ cat.cat_id class=categoryActive && categoryActive.cat_id  === cat.cat_id ? "active" : "")=cat.cat_name
-                            if(logged)
-                                li.nav-item
-                                    a.nav-link(href="/categories") Editer categories                     
+                        
+                        
+                                              
         div.row
             div.col
                 div.bg-light.p-5
