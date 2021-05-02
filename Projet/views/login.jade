@@ -13,10 +13,11 @@ block body
                     label(for="password") Password
                         input(type="password" id="password" name="password")
                 div.flex.p-2
-                    input(type="submit" value="Login")
+                    form(method="POST" action="/login")
+                        input(type="submit" value="Login")
         else
             form(method="POST" action="/login")
                 input(type="submit" value="Logout")
-        form(method="POST" action="/logout")
+        form(method="POST" action='/blog')
             input(type="submit" value="Retour accueil")
 
