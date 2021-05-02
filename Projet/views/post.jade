@@ -21,7 +21,7 @@ block body
                 span.badge.rounded-pill.bg-secondary author
                 span.badge.rounded-pill.bg-secondary 01/01/01
                 p=post.content
-                form(action="/post/commentaire/create" method="GET")
+                form(action="/commentaire" method="GET")
                             input(type="Submit" value="Ajouter un commentaire")
                 form(action="/post/" + post.id + "/edit" method="GET")
                             input(type="Submit" value="Editer")            
