@@ -102,6 +102,7 @@ app.post('/login',async(req, res) => {
   }
   
   res.render('login',data)
+  }
 })
 
 app.get('/signup',(req, res) => {
