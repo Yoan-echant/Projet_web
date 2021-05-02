@@ -43,47 +43,134 @@ const categories = [
   {id: 'cat2', name: 'Catégorie 2', link:"/cat2"}
 ]
 
+app.post('/blog',(req, res) => {
+  res.redirect(302,'/')
+})
+
 app.get('/login',(req, res) => {
   res.render('login', {logged: req.session.logged})
 })
 
-app.post('/login',(req, res) => {
+app.post('/login',async(req, res) => {
   const username = req.body.username
   const password = req.body.password
-  let data = {
+  const db = await openDb()
+  const userdatas = await db.all(`
+    SELECT * FROM userdata
+  `)
+  let test =0
+  console.log(userdatas.length)
+  for (let step=1; step < userdatas.length+1; step++ ){
+    if (
+      test == 0
+    ){
+      const users = await db.all(`
+        SELECT username FROM userdata
+        WHERE id =?
+      ` ,[step])
+      const users_pass = await db.all(`
+        SELECT password FROM userdata
+        WHERE id =?
+      ` ,[step])
+      console.log("username "+users[0].username)
+      //console.log(username)
+      console.log("password "+users_pass[0].password)
+      if(
+        username == users[0].username
+        ){
+          test = 1  
+          //console.log(users_pass[0].password)
+          //console.log(password)
+          if(
+            password == users_pass[0].password
+          ) {
+            console.log("Connexion ok")
+            req.session.logged = true
+            data = {
+              success: "Vous êtes log",
+              logged: true
+            }
+          }else{
+            data = {
+            errors: "Le mot de passe n'est pas valide",
+            logged: false
+            }
+          }
+      }
+    }
   }
+  console.log(test)
   if(
-    username !== authentification.username
+    test == 0
   ) {
     data = {
       errors: "Le nom d'utilisateur est inconnu",
       logged: false
     }
-  } else if(
-    password !== authentification.password
-  ) {
-    data = {
-      errors: "Le mot de passe n'est pas valide",
-      logged: false
-    }
-  }else {
-    req.session.logged = true
-    data = {
-      success: "Vous êtes log",
-      logged: true
-    }
   }
   res.render('login',data)
 })
-app.post('/logout',(req, res) => {
+
+app.get('/signup',(req, res) => {
+  res.render('signup')
+})
+
+app.post('/signup',async (req, res) => {
+  const db = await openDb()
+  const userdatas = await db.all(`
+    SELECT * FROM userdata
+  `)
+  const username = req.body.username
+  const password = req.body.password
+  const password_ver= req.body.password_ver
+  let test = 0
+  let data = {
+  }
+  for (let step=1; step < userdatas.length+1; step++ ){
+    const users = await db.all(`
+      SELECT username FROM userdata
+      WHERE ID = ?
+    `,[step])
+    if(
+      username == users[0].username
+    ) {
+      test = 1
+      data = {
+        errors: "Le nom d'utilisateur déja utilisé",
+        logged: false
+      }
+      res.render('signup',data)
+    }else if (
+      password != password_ver
+    ){
+      test = 1
+      data = {
+        errors: "Veuillez entrer deux fois le même mot de passe",
+        logged: false
+      }
+      res.render('signup',data)
+    }
+  }if (
+    test ==0
+  ){
+    console.log("username: "+ username +"   "+"mdp: "+ password)
+    const add_users =await db.run(`
+      INSERT INTO userdata(username,password)
+      VALUES(?, ?)
+    `,[username, password])
+    res.redirect(302,'/login')
+  }
+})
+
+
+app.get('/logout',(req, res) => {
+  console.log(req.session.logged)
  if (req.session.logged = false){
-  res.redirect(302,'/login')
+    res.redirect(302,'/login')
+ }else {
+    req.session.logged = false
+    res.redirect(302,'/')
  }
- if (req.session.logged = true){
-  res.redirect(302,'/')
- }
-  
-  
 })
 app.get('/lecture', async (req, res) => {
   const db = await openDb()
@@ -126,6 +213,7 @@ app.get('/commentaire', async (req, res) => {
   res.render("commentaires", data)
 })
 
+
 app.post('/commentaire', async (req, res) => {
   if(!req.session.logged){
     res.redirect(302,'/login')
@@ -157,6 +245,21 @@ app.post('/commentaire', async (req, res) => {
 /*app.get('/commentaire/edit', async (req, res) => {
   
 */
+app.post('/post/:id/delete', async (req, res) => {
+  if(!req.session.logged){
+    res.redirect(302,'/login')
+    return
+  }
+
+  const db = await openDb()
+  const id = req.params.id
+  await db.run(`
+    DELETE FROM posts
+    WHERE id = ?
+  `,[id])
+  res.redirect("/")
+})
+
 app.get('/post/create', async (req, res) => {
   if(!req.session.logged){
     res.redirect(302,'/login')

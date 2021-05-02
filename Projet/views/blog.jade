@@ -18,6 +18,9 @@ block body
                             if (logged)
                                 li.nav-item
                                     a.nav-link(href="/post/create") Créer un nouveau post
+                             if(logged)
+                                li.nav-item
+                                    a.nav-link(href="/logout") Se deconnecter
                                     
                             if(!logged)
                                 li.nav-item
