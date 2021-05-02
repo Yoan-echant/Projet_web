@@ -47,44 +47,113 @@ app.get('/login',(req, res) => {
   res.render('login', {logged: req.session.logged})
 })
 
-app.post('/login',(req, res) => {
+app.post('/login',async(req, res) => {
   const username = req.body.username
   const password = req.body.password
-  let data = {
+  const db = await openDb()
+  const userdatas = await db.all(`
+    SELECT * FROM userdata
+  `)
+  let test =0
+  console.log(userdatas.length)
+  for (let step=1; step< userdatas.length+1; step++ ){
+    if (
+      test == 0
+    ){
+      const users = await db.all(`
+        SELECT username FROM userdata
+       WHERE id =?
+     ` ,[step])
+    const users_pass = await db.all(`
+      SELECT password FROM userdata
+      WHERE id =?
+    ` ,[step])
+    console.log(users[0].username)
+    console.log(username)
+    if(
+      username == users[0].username
+      ){
+      let test = 1  
+      console.log(users_pass[0].password)
+      console.log(password)
+      if(
+        password == users_pass[0].password
+      ) {
+        req.session.logged = true
+        data = {
+          success: "Vous êtes log",
+          logged: true
+        }
+      }else{
+        data = {
+          errors: "Le mot de passe n'est pas valide",
+          logged: false
+        }
+      }
+    }
   }
   if(
-    username !== authentification.username
+    test == 0
   ) {
     data = {
       errors: "Le nom d'utilisateur est inconnu",
       logged: false
     }
-  } else if(
-    password !== authentification.password
-  ) {
-    data = {
-      errors: "Le mot de passe n'est pas valide",
-      logged: false
-    }
-  }else {
-    req.session.logged = true
-    data = {
-      success: "Vous êtes log",
-      logged: true
-    }
   }
+  
   res.render('login',data)
 })
+
+app.get('/signup',(req, res) => {
+  res.render('signup')
+})
+
+app.post('/signup',async (req, res) => {
+  const db = await openDb()
+  const users = await db.all(`
+    SELECT username FROM userdata
+  `)
+  const username = req.body.username
+  const password = req.body.password
+  const password_ver= req.body.password_ver
+  let data = {
+  }
+  if(
+    username == users
+  ) {
+    data = {
+      errors: "Le nom d'utilisateur déja utilisé",
+      logged: false
+    }
+    res.render('signup',data)
+  }else if (
+      password != password_ver
+  ){
+    data = {
+      errors: "Veuillez entrer deux fois le même mot de passe",
+      logged: false
+    }
+    res.render('signup',data)
+  }else {
+    const add_users =await db.run(`
+      INSERT INTO userdata(username,password)
+      VALUES(?, ?)
+    `,[username, password])
+    res.redirect(302,'/login')
+  }
+})
+
+
 app.post('/logout',(req, res) => {
  if (req.session.logged = false){
   res.redirect(302,'/login')
  }
  if (req.session.logged = true){
   res.redirect(302,'/')
- }
-  
-  
+ } 
 })
+
+
 app.get('/commentaire', async (req, res) => {
   if(!req.session.logged){
     res.redirect(302,'/login')
@@ -115,6 +184,8 @@ app.post('/commentaire/edit', async (req, res) => {
   `,[name, content, category])
   res.redirect("/post/")
 })
+
+
 /*app.get('/commentaire', async (req, res) => {
   if(!req.session.logged){
     res.redirect(302,'/login')
@@ -156,6 +227,7 @@ app.get('/commentaire/:id', async (req, res) => {
   `,[id])
   res.render("post",{post: post})
 })
+*/
 
 app.get('/post/:id/edit', async (req, res) => {
   if(!req.session.logged){
@@ -209,7 +281,8 @@ app.post('/post/:id/delete', async (req, res) => {
     WHERE id = ?
   `,[id])
   res.redirect("/")
-})*/
+})
+
 app.get('/post/create', async (req, res) => {
   if(!req.session.logged){
     res.redirect(302,'/login')

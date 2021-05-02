@@ -97,7 +97,7 @@ async function createTables(db){
           FOREIGN KEY(article) REFERENCES post(id)
         )
   `)
-  return await Promise.all([cat, post,users, commentaire])
+  return await Promise.all([cat, post, users, commentaire])
 }
 
 
