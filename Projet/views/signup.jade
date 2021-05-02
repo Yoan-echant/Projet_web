@@ -1,0 +1,26 @@
+extends layout
+block body
+    div.container
+        if !logged
+            if errors
+              div.p-2.alert.alert-danger
+                h4=errors
+            form(method="POST" action="/signup")
+                div.p-2
+                    label(for="mail") Adresse mail
+                        input(type="text" id="mail" name="mail")
+                div.p-2
+                    label(for="username") Username
+                        input(type="text" id="username" name="username")
+                div.p-2
+                    label(for="password") Password
+                        input(type="password" id="password" name="password")
+                div.p-2
+                    label(for="password_ver") Password
+                        input(type="password" id="password_ver" name="password_ver")
+                div.flex.p-2
+                    form(method="POST" action="/signup")
+                        input(type="submit" value="Create account")
+        else
+            form(method="POST" action="/logout")
+                input(type="submit" value="Logout")
