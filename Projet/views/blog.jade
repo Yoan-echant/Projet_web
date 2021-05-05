@@ -14,6 +14,9 @@ block body
                                     a.nav-link(href="/"+ cat.cat_id class=categoryActive && categoryActive.cat_id  === cat.cat_id ? "active" : "")=cat.cat_name
                             if(logged)
                                 li.nav-item
+                                    a.nav-link(href="/tendance") Tendance
+                            if(logged)
+                                li.nav-item
                                     a.nav-link(href="/categories") Editer categories
                             if (logged)
                                 li.nav-item

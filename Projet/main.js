@@ -163,6 +163,25 @@ app.post('/signup',async (req, res) => {
 })
 
 
+app.get('/tendance', async(req,res) =>{
+  const db = await openDb()
+  const categories = await db.all(`
+    SELECT * FROM categories
+  `)
+  let posts = []
+  posts = await db.all(`
+    SELECT * FROM posts
+    INNER JOIN avis on avis.id = posts.id
+    ORDER BY like
+  `)
+  console.log(posts)
+  res.render("tendance",{posts: posts,categories: categories, logged: req.session.logged})
+})
+
+app.post('/tendance', async(req,res) =>{
+  res.redirect('/tendance')
+})
+
 app.get('/logout',(req, res) => {
   console.log(req.session.logged)
  if (req.session.logged = false){
@@ -478,6 +497,8 @@ app.get('/:cat?', async (req, res) => {
   }
   res.render("blog",{categories: categories, categoryActive: categoryObjectActive, posts: posts, logged: req.session.logged})
 })
+
+
 
 app.listen(port,  () => {
   console.log(`Example app listening at http://localhost:${port}`)
