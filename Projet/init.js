@@ -1,6 +1,6 @@
 const {openDb} = require("./db")
 
-const tablesNames = ["categories","posts","userdata", "commentaires"]
+const tablesNames = ["categories","posts","userdata", "commentaires","avis"]
 
 
 
@@ -33,12 +33,14 @@ async function createPosts(db){
   const contents = [{
     name: "Article 1",
     content: "Lorem lipsum, Lorem lipsum Lorem lipsum Lorem lipsum",
-    category: 1
+    category: 1,
+    article: 1
   },
     {
       name: "Article 2",
       content: "Lorem lipsum, Lorem lipsum Lorem lipsum Lorem lipsum",
-      category: 2
+      category: 2,
+      article: 1
     }
   ]
   return await Promise.all(contents.map(post => {
@@ -64,6 +66,29 @@ async function createCommentaire(db){
   }))
 }
 
+async function createAvis(db){
+  const insertRequest = await db.prepare("INSERT INTO avis(dislike, like) VALUES(?, ?)")
+  const avis = [{
+    dislike: 1,
+    like: 3,
+    dislikemis: 0,
+    likemis: 0,
+    article: 1
+  }, 
+  {
+    dislike: 4,
+    like: 0,
+    dislikemis: 0,
+    likemis: 0,
+    article: 2
+    
+  }
+  ]
+  return await Promise.all( avis.map(av => {
+    return insertRequest.run([av.dislike, av.like])
+  }))
+}
+
 async function createTables(db){
   const cat = db.run(`
     CREATE TABLE IF NOT EXISTS categories(
@@ -77,6 +102,7 @@ async function createTables(db){
           name varchar(255),
           category int,
           content text,
+          article int,
           FOREIGN KEY(category) REFERENCES categories(cat_id)
         )
   `)
@@ -97,7 +123,17 @@ async function createTables(db){
           FOREIGN KEY(article) REFERENCES post(id)
         )
   `)
-  return await Promise.all([cat, post, users, commentaire])
+  const avis= db.run(`
+       CREATE TABLE IF NOT EXISTS avis(
+          id INTEGER PRIMARY KEY,
+          dislike int,
+          like int,
+          dislikemis int,
+          likemis int,
+          article int
+        )
+`)
+  return await Promise.all([cat, post, users, commentaire, avis])
 }
 
 
@@ -119,4 +155,5 @@ async function dropTables(db){
   await createPosts(db)
   await createUserdata(db)
   await createCommentaire(db)
+  await createAvis(db)
 })()

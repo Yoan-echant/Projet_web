@@ -304,7 +304,44 @@ app.get('/post/:id', async (req, res) => {
     LEFT JOIN categories on categories.cat_id = posts.category
     WHERE id = ?
   `,[id])
-  res.render("post",{post: post})
+  console.log(post.content)
+  const avis = await db.get(`
+  SELECT like,dislike  FROM avis
+  WHERE id = ?
+`,[id])
+  console.log(avis.like)
+  avis.like=avis.like+1;
+  const like=avis.like;
+  const avis2 = await db.run(`
+    INSERT INTO avis(like)
+    VALUES(?)
+  `,[like])
+  console.log(req.body.like);
+
+/*const like=req.body.like
+console.log(like)
+
+ if(req.body.like == true){
+   avis.like++
+   console.log("123")
+  }*/
+  
+  console.log(avis.like)
+  res.render("post",{post: post, avis: avis})
+})
+
+app.get('/avis', async (req, res) => {
+  const db = await openDb()
+  const id = req.params.id
+  
+  const avis = await db.get(`
+  SELECT like,dislike  FROM avis
+  WHERE id = ?
+`,[id])
+
+  avis.like++;
+  console.log(avis.like)
+  res.render("post")
 })
 
 app.get('/post/:id/edit', async (req, res) => {
