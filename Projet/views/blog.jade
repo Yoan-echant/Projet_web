@@ -1,33 +1,36 @@
 extends layout
 block body
-    div.container-sm
+     div.container-fluid.bg-secondary
         div.row
             div.col
-                div.header
-                    nav.d-flex.justify-content-between.align-items-center
-                        h3.text-muted.mr-auto.p-2 Blog
-                        ul.nav.nav-pills.justify-content-end
+                div.header.bg-danger
+                    nav.d-flex.justify-content-center.align-items-center
+                          ul.nav.nav-pills.justify-content-end.bg-danger
                             li.nav-item
-                                a.nav-link(href="/" class=!categoryActive ? "active" : "") Acceuil
-                            each cat in categories
+                                a.nav-link(href="/" class=!categoryActive ? "active" : "" ).bg-green Acceuil
+                             each cat in categories
                                 li.nav-item
                                     a.nav-link(href="/"+ cat.cat_id class=categoryActive && categoryActive.cat_id  === cat.cat_id ? "active" : "")=cat.cat_name
                             if(logged)
                                 li.nav-item
-                                    a.nav-link(href="/categories") Editer categories
+                                    a.nav-link(href="/categories").bg-green Editer categories
                             if (logged)
                                 li.nav-item
-                                    a.nav-link(href="/post/create") Créer un nouveau post
-                             if(logged)
+                                    a.nav-link(href="/post/create").bg-green Créer un nouveau post 
+                            if(logged)
                                 li.nav-item
-                                    a.nav-link(href="/logout") Se deconnecter
+                                    a.nav-link(href="/logout").bg-green Se deconnecter
                                     
                             if(!logged)
                                 li.nav-item
-                                    a.nav-link(href="/login") Se connecter
+                                    a.nav-link(href="/login").bg-green Se connecter
                             if(!logged)
                                 li.nav-item
-                                    a.nav-link(href="/signup") Créer un compte
+                                    a.nav-link(href="/signup") Créer un compte 
+                            img(src='https://upload.wikimedia.org/wikipedia/fr/thumb/5/58/Reddit_logo_new.svg/1200px-Reddit_logo_new.svg.png' style="width:80px; height:40px" )
+                           
+       
+       
         div.row
             div.col
                 div.bg-light.p-5
@@ -40,6 +43,7 @@ block body
                 each postToRow, index in posts
                   if index % 3 === 0
                     div.row
+                    div.bg-light.p-5
                         each indexToSearch in [index, index + 1, index + 2]
                             if posts[indexToSearch]
                                 div.col
@@ -54,4 +58,4 @@ block body
                   div.col
 
          div.row 
-             img( src='./image_reddit.jpg' ) 
+            

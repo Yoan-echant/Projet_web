@@ -304,45 +304,68 @@ app.get('/post/:id', async (req, res) => {
     LEFT JOIN categories on categories.cat_id = posts.category
     WHERE id = ?
   `,[id])
-  console.log(post.content)
-  const avis = await db.get(`
+  //console.log(post.content)
+  const aviss = await db.get(`
   SELECT like,dislike  FROM avis
   WHERE id = ?
 `,[id])
-  console.log(avis.like)
-  avis.like=avis.like+1;
-  const like=avis.like;
-  const avis2 = await db.run(`
-    INSERT INTO avis(like)
-    VALUES(?)
-  `,[like])
-  console.log(req.body.like);
+  console.log(aviss.like)
 
-/*const like=req.body.like
-console.log(like)
-
- if(req.body.like == true){
-   avis.like++
-   console.log("123")
-  }*/
   
-  console.log(avis.like)
-  res.render("post",{post: post, avis: avis})
+  const avis2 = await db.get(`
+    UPDATE avis
+    SET like = ?
+    WHERE id = ? 
+  `,[ aviss.like+1 , id])
+  console.log(req.body.like);
+  
+  
+  console.log(aviss.like)
+  res.render("post",{post: post, aviss: aviss, id: id})
 })
 
-app.get('/avis', async (req, res) => {
+app.post('/like/:id', async (req, res) => {
   const db = await openDb()
   const id = req.params.id
+  //console.log(id)
   
-  const avis = await db.get(`
-  SELECT like,dislike  FROM avis
-  WHERE id = ?
-`,[id])
-
-  avis.like++;
-  console.log(avis.like)
-  res.render("post")
+  const aviss = await db.get(`
+    SELECT like,dislike  FROM avis
+    WHERE id = ?
+  `,[id])
+  //console.log(aviss.like)
+  const avis2s = await db.get(`
+    UPDATE avis
+    SET like = ?
+    WHERE id = ? 
+  `,[ aviss.like+1 , id])
+  //console.log(req.body.like);
+  
+  console.log(aviss.like)
+  res.redirect('/post/:id')
 })
+
+app.get('/dislike', async (req, res) => {
+  const db = await openDb()
+  const id = req.params.id
+  console.log(id)
+  
+  const aviss = await db.get(`
+    SELECT like,dislike  FROM avis
+    WHERE id = ?
+  `,[id])
+  //console.log(aviss.like)
+  const avis2s = await db.get(`
+    UPDATE avis
+    SET dislike = ?
+    WHERE id = ? 
+  `,[ aviss.dislike-1 , id])
+  //console.log(req.body.like);
+  
+  console.log(aviss.like)
+  res.redirect('/post/:id')
+})
+
 
 app.get('/post/:id/edit', async (req, res) => {
   if(!req.session.logged){
