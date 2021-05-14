@@ -1,0 +1,60 @@
+extends layout
+block body
+    div.container-sm
+        div.row
+            div.col
+                div.header
+                    nav.d-flex.justify-content-between.align-items-center
+                        h3.text-muted.mr-auto.p-2 Blog
+                        ul.nav.nav-pills.justify-content-end
+                            li.nav-item
+                                a.nav-link(href="/" class=!categoryActive ? "active" : "") Acceuil
+                            each cat in categories
+                                li.nav-item
+                                    a.nav-link(href="/"+ cat.cat_id class=categoryActive && categoryActive.cat_id  === cat.cat_id ? "active" : "")=cat.cat_name
+                            if(logged)
+                                li.nav-item
+                                    a.nav-link(href="/tendance") Tendance
+                            if(logged)
+                                li.nav-item
+                                    a.nav-link(href="/categories") Editer categories
+                            if (logged)
+                                li.nav-item
+                                    a.nav-link(href="/post/create") Créer un nouveau post
+                             if(logged)
+                                li.nav-item
+                                    a.nav-link(href="/logout") Se deconnecter
+                                    
+                            if(!logged)
+                                li.nav-item
+                                    a.nav-link(href="/login") Se connecter
+                            if(!logged)
+                                li.nav-item
+                                    a.nav-link(href="/signup") Créer un compte
+        div.row
+            div.col
+                div.bg-light.p-5
+                    div.container
+                        h1.text-center=categoryActive ? categoryActive.cat_name : "Tendance"
+        
+
+        div.row.mt-6
+            div.col
+                each postToRow, index in posts
+                  if index % 3 === 0
+                    div.row
+                        each indexToSearch in [index, index + 1, index + 2]
+                            if posts[indexToSearch]
+                                div.col
+                                    a(href="/post/" + posts[indexToSearch].id)
+                                        h4=posts[indexToSearch].name
+                                        if !categoryActive
+                                            span.badge.rounded-pill.bg-primary=posts[indexToSearch].cat_name
+                                        span.badge.rounded-pill.bg-secondary author
+                                        span.badge.rounded-pill.bg-secondary 01/01/01
+                                        p=posts[indexToSearch].content
+                if posts.length <= 0
+                  div.col
+
+         div.row 
+             img( src='./image_reddit.jpg' ) 

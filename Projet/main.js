@@ -13,6 +13,7 @@ const sess = {
   secret: 'secret key',
   resave: true,
   rolling: true,
+  numuser: -1,
   cookie: {
     maxAge: 1000 * 3600//ms
   },
@@ -48,7 +49,7 @@ app.post('/blog',(req, res) => {
 })
 
 app.get('/login',(req, res) => {
-  res.render('login', {logged: req.session.logged})
+  res.render('login', {logged: req.session.logged, numuser: req.session.numuser})
 })
 
 app.post('/login',async(req, res) => {
@@ -59,7 +60,7 @@ app.post('/login',async(req, res) => {
     SELECT * FROM userdata
   `)
   let test =0
-  console.log(userdatas.length)
+  
   for (let step=1; step < userdatas.length+1; step++ ){
     if (
       test == 0
@@ -72,23 +73,18 @@ app.post('/login',async(req, res) => {
         SELECT password FROM userdata
         WHERE id =?
       ` ,[step])
-      console.log("username "+users[0].username)
-      //console.log(username)
-      console.log("password "+users_pass[0].password)
-      if(
-        username == users[0].username
+      if(username == users[0].username
         ){
-          test = 1  
-          //console.log(users_pass[0].password)
-          //console.log(password)
+          test = 1
           if(
             password == users_pass[0].password
           ) {
-            console.log("Connexion ok")
             req.session.logged = true
+            req.session.numuser= step
             data = {
               success: "Vous êtes log",
-              logged: true
+              logged: true,
+              numuser: step
             }
           }else{
             data = {
@@ -99,7 +95,6 @@ app.post('/login',async(req, res) => {
       }
     }
   }
-  console.log(test)
   if(
     test == 0
   ) {
@@ -123,7 +118,6 @@ app.post('/signup',async (req, res) => {
   const userdatas = await db.all(`
     SELECT * FROM userdata
   `)
-  console.log(username)
   let test = 0
   let data = {
   }
@@ -173,15 +167,44 @@ app.get('/tendance', async(req,res) =>{
   posts = await db.all(`
     SELECT * FROM posts
     INNER JOIN avis on avis.id = posts.id
-    ORDER BY like
+    ORDER BY like DESC
   `)
+ 
   console.log(posts)
-  res.render("tendance",{posts: posts,categories: categories, logged: req.session.logged})
+  res.render("tendance",{posts: posts,categories: categories, logged: req.session.logged, numuser: req.session.numuser})
 })
 
 app.post('/tendance', async(req,res) =>{
   res.redirect('/tendance')
 })
+
+
+
+app.get('/visite', async(req,res) =>{
+  if (req.session.logged == false){
+    res.redirect('/login')
+  }
+  numerouser = req.session.numuser
+  console.log(numerouser)
+  const db = await openDb()
+  const categories = await db.all(`
+    SELECT * FROM categories
+  `)
+  let posts = []
+  posts = await db.all(`
+    SELECT * FROM posts
+    INNER JOIN visite on visite.article = posts.id
+    WHERE user= ?
+  `,[numerouser])
+  console.log(posts)
+  res.render("visite",{posts: posts,categories: categories, logged: req.session.logged, numuser: req.session.numuser})
+})
+
+app.post('/visite', async(req,res) =>{
+  res.redirect('/tendance')
+})
+
+
 
 app.get('/logout',(req, res) => {
   console.log(req.session.logged)
@@ -514,7 +537,7 @@ app.get('/:cat?', async (req, res) => {
       WHERE category = ?
   `, [categoryActive])
   }
-  res.render("blog",{categories: categories, categoryActive: categoryObjectActive, posts: posts, logged: req.session.logged})
+  res.render("blog",{categories: categories, categoryActive: categoryObjectActive, posts: posts, logged: req.session.logged, numuser: req.session.numuser})
 })
 
 

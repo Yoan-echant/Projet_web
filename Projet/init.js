@@ -1,6 +1,6 @@
 const {openDb} = require("./db")
 
-const tablesNames = ["categories","posts","userdata", "commentaires","avis"]
+const tablesNames = ["categories","posts","userdata", "commentaires", "avis", "visite"]
 
 
 
@@ -89,6 +89,18 @@ async function createAvis(db){
   }))
 }
 
+async function createVisite(db){
+  const insertRequest = await db.prepare("INSERT INTO visite(user, article) VALUES(?, ?)")
+  const visite = [{
+    user: 2,
+    article: 1
+  }
+  ]
+  return await Promise.all( visite.map(vis => {
+    return insertRequest.run([vis.user, vis.article])
+  }))
+}
+
 async function createTables(db){
   const cat = db.run(`
     CREATE TABLE IF NOT EXISTS categories(
@@ -133,7 +145,14 @@ async function createTables(db){
           article int
         )
 `)
-  return await Promise.all([cat, post, users, commentaire, avis])
+const visite = db.run(`
+        CREATE TABLE IF NOT EXISTS visite(
+          id INTEGER PRIMARY KEY,
+          user int,
+          article int
+        )
+  `)
+  return await Promise.all([cat, post, users, commentaire, avis, visite])
 }
 
 
@@ -156,4 +175,5 @@ async function dropTables(db){
   await createUserdata(db)
   await createCommentaire(db)
   await createAvis(db)
+  await createVisite(db)
 })()
