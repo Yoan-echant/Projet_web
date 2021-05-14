@@ -1,23 +1,56 @@
 extends layout
 block body
-    div.container
-        if !logged
-            if errors
-              div.p-2.alert.alert-danger
-                h4=errors
-            form(method="POST" action="/login")
-                div.p-2
-                    label(for="username") Username
-                        input(type="text" id="username" name="username")
-                div.p-2
-                    label(for="password") Password
-                        input(type="password" id="password" name="password")
-                div.flex.p-2
-                    form(method="POST" action="/login")
-                        input(type="submit" value="Login")
-        else
-            form(method="POST" action="/login")
-                input(type="submit" value="Logout")
-        form(method="POST" action='/blog')
-            input(type="submit" value="Retour accueil")
+    div.container-fluid.bg-secondary
+        div.row
+            div.col
+                div.header.bg-danger
+                    nav.d-flex.justify-content-beetween.align-items-center
+                          ul.nav.justify-content-center.bg-danger
+                            li.nav-item
+                                a.nav-link(href="/" class=!categoryActive ? "active" : "" class="link-dark") Acceuil
+                             //each cat in categories
+                                li.nav-item
+                                    a.nav-link(href="/"+ cat.cat_id class=categoryActive && categoryActive.cat_id  === cat.cat_id ? "active" : "")=cat.cat_name
+                            //if(logged)
+                                li.nav-item
+                                    a.nav-link(href="/categories" ) Editer categories
+                            //if (logged)
+                                li.nav-item
+                                    a.nav-link(href="/post/create") Créer un nouveau post 
+                            //if(logged)
+                                li.nav-item
+                                    a.nav-link(href="/logout") Se deconnecter
+                                    
+                            //if(!logged)
+                                li.nav-item
+                                    a.nav-link(href="/login" text-green) Se connecter
+                            //if(!logged)
+                                li.nav-item
+                                    a.nav-link(href="/signup") Créer un compte 
+                            img(src='https://upload.wikimedia.org/wikipedia/fr/thumb/5/58/Reddit_logo_new.svg/1200px-Reddit_logo_new.svg.png' style="width:80px; height:40px" )
+                           
+       
+       
+        div.row
+            div.col
+                div.bg-light.p-5
+                    if !logged
+                        if errors
+                            div.p-2.alert.alert-danger
+                        h4=errors
+                        form(method="POST" action="/login")
+                            div.p-2
+                                label(for="username") Username
+                                    input(type="text" id="username" name="username")
+                            div.p-2
+                                    label(for="password") Password
+                                        input(type="password" id="password" name="password")
+                            div.flex.p-2
+                                form(method="POST" action="/login")
+                                    input(type="submit" value="Login")
+                    else
+                         form(method="POST" action="/login")
+                            input(type="submit" value="Logout")
+                        form(method="POST" action='/blog')
+                            input(type="submit" value="Retour accueil")
 

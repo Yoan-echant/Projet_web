@@ -1,11 +1,16 @@
 extends layout
 block body
-    div.container-sm
+     div.container-fluid.bg-secondary
         div.row
             div.col
-                div.header
-                    nav.d-flex.justify-content-between.align-items-center
-                        h3.text-muted.mr-auto.p-2 Blog
+                div.header.bg-danger
+                    nav.d-flex.justify-content-beetween.align-items-center
+                          ul.nav.justify-content-end.bg-danger
+                            li.nav-item
+                                a.nav-link(href="/" class=!categoryActive ? "active" : "" class="link-dark" ).bg-green Acceuil
+                            
+                            img(src='https://upload.wikimedia.org/wikipedia/fr/thumb/5/58/Reddit_logo_new.svg/1200px-Reddit_logo_new.svg.png' style="width:80px; height:40px" )
+                         
         form(action="/post/create" method="POST")
             div.row
                 input(type="Submit" value="Sauvegarder")

@@ -1,11 +1,36 @@
 extends layout 
 block body
-    div.container-sm
+  div.container-fluid.bg-secondary
         div.row
             div.col
-                div.header
-                    nav.d-flex.justify-content-between.align-items-center
-                        h3.text-muted.mr-auto.p-2 Blog
+                div.header.bg-danger
+                    nav.d-flex.justify-content-center.align-items-center
+                          ul.nav.nav-pills.justify-content-end.bg-danger
+                            li.nav-item
+                                a.nav-link(href="/" class=!categoryActive ? "active" : "" class="link-dark" ).bg-green Acceuil
+                             //each cat in categories
+                                li.nav-item
+                                    a.nav-link(href="/"+ cat.cat_id class=categoryActive && categoryActive.cat_id  === cat.cat_id ? "active" : "")=cat.cat_name
+                            if(logged)
+                                li.nav-item
+                                    a.nav-link(href="/categories" class="link-dark").bg-green Editer categories
+                            if (logged)
+                                li.nav-item
+                                    a.nav-link(href="/post/create" class="link-dark").bg-green Créer un nouveau post 
+                            if(logged)
+                                li.nav-item
+                                    a.nav-link(href="/logout" class="link-dark").bg-green Se deconnecter
+                                    
+                            if(!logged)
+                                li.nav-item
+                                    a.nav-link(href="/login" class="link-dark").bg-green Se connecter
+                            if(!logged)
+                                li.nav-item
+                                    a.nav-link(href="/signup" class="link-dark") Créer un compte 
+                            img(src='https://upload.wikimedia.org/wikipedia/fr/thumb/5/58/Reddit_logo_new.svg/1200px-Reddit_logo_new.svg.png' style="width:80px; height:40px" )
+                           
+       
+   
                         
                         
                                               
@@ -17,16 +42,28 @@ block body
 
         div.row
             div.col
-                span.badge.rounded-pill.bg-primary=post.cat_name
-                span.badge.rounded-pill.bg-secondary author
-                span.badge.rounded-pill.bg-secondary 01/01/01
-                p=post.content
-            
-                form(action="/commentaire" method="GET")
-                            input(type="Submit" value="Ajouter un commentaire")
-                form(action="/post/"+post.id method="GET")
-                            input(name= "like" type="button" value="Like")
+                 .panel.panel-default
+                    .panel-heading      
+                     span.badge.rounded-pill.bg-primary=post.cat_name
+                     span.badge.rounded-pill.bg-secondary author
+                     span.badge.rounded-pill.bg-secondary 01/01/01
+                     .panel-body
+                     p=post.content
+                      div.col-3
+                            div.p-2
+                                form(action="/commentaire" method="GET")
+                                            input(type="Submit" value="Ajouter un commentaire")
+                            div.p-2             
+                                form(action="/post/" + post.id + "/edit" method="GET")
+                                         input(type="Submit" value="Editer") 
+                            p= 'nombre de like : ' + data.like  
+                            div.p-2
+                                form(action="/like/" +post.id method="POST")
+                                            input(name= "like" type="image" src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Facebook_Like_button.svg/1200px-Facebook_Like_button.svg.png" style="width:80px; height:60px" value="Like")
+                            p= 'nombre de dislike :' + data.dislike  
+                            div.p-2
+                                form(action="/dislike/"+post.id method="GET")
+                                            input(name= "dislike" type="image" src="https://proofmart.com/wp-content/uploads/2020/09/dislike-thumb-product.png" style="width:80px; height:60px" value="Dislike")
                             
                 
-                form(action="/post/" + post.id + "/edit" method="GET")
-                            input(type="Submit" value="Editer")            
+                         
