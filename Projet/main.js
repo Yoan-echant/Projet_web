@@ -116,13 +116,14 @@ app.get('/signup',(req, res) => {
 })
 
 app.post('/signup',async (req, res) => {
+  const username = req.body.username
+  const password = req.body.password
+  const password_ver= req.body.password_ver
   const db = await openDb()
   const userdatas = await db.all(`
     SELECT * FROM userdata
   `)
-  const username = req.body.username
-  const password = req.body.password
-  const password_ver= req.body.password_ver
+  console.log(username)
   let test = 0
   let data = {
   }
