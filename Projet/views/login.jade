@@ -4,27 +4,27 @@ block body
         div.row
             div.col
                 div.header.bg-danger
-                    nav.d-flex.justify-content-center.align-items-center
+                    nav.d-flex.justify-content-beetween.align-items-center
                           ul.nav.justify-content-center.bg-danger
                             li.nav-item
-                                a.nav-link(href="/" class=!categoryActive ? "active" : "" ).bg-green Acceuil
+                                a.nav-link(href="/" class=!categoryActive ? "active" : "" class="link-dark") Acceuil
                              //each cat in categories
                                 li.nav-item
                                     a.nav-link(href="/"+ cat.cat_id class=categoryActive && categoryActive.cat_id  === cat.cat_id ? "active" : "")=cat.cat_name
-                            if(logged)
+                            //if(logged)
                                 li.nav-item
                                     a.nav-link(href="/categories" ) Editer categories
-                            if (logged)
+                            //if (logged)
                                 li.nav-item
                                     a.nav-link(href="/post/create") Créer un nouveau post 
-                            if(logged)
+                            //if(logged)
                                 li.nav-item
                                     a.nav-link(href="/logout") Se deconnecter
                                     
-                            if(!logged)
+                            //if(!logged)
                                 li.nav-item
                                     a.nav-link(href="/login" text-green) Se connecter
-                            if(!logged)
+                            //if(!logged)
                                 li.nav-item
                                     a.nav-link(href="/signup") Créer un compte 
                             img(src='https://upload.wikimedia.org/wikipedia/fr/thumb/5/58/Reddit_logo_new.svg/1200px-Reddit_logo_new.svg.png' style="width:80px; height:40px" )

@@ -4,35 +4,18 @@ block body
          div.row
             div.col
                 div.header.bg-danger
-                    nav.d-flex.justify-content-center.align-items-center
+                    nav.d-flex.justify-content-beetween.align-items-center
                           ul.nav.justify-content-end.bg-danger
                             li.nav-item
-                                a.nav-link(href="/" class=!categoryActive ? "active" : "" ).bg-green Acceuil
-                             //each cat in categories
-                                li.nav-item
-                                    a.nav-link(href="/"+ cat.cat_id class=categoryActive && categoryActive.cat_id  === cat.cat_id ? "active" : "")=cat.cat_name
-                            if(logged)
-                                li.nav-item
-                                    a.nav-link(href="/categories").bg-green Editer categories
-                            if (logged)
-                                li.nav-item
-                                    a.nav-link(href="/post/create").bg-green Créer un nouveau post 
-                            if(logged)
-                                li.nav-item
-                                    a.nav-link(href="/logout").bg-green Se deconnecter
-                                    
-                            if(!logged)
-                                li.nav-item
-                                    a.nav-link(href="/login").bg-green Se connecter
-                            if(!logged)
-                                li.nav-item
-                                    a.nav-link(href="/signup") Créer un compte 
+                                a.nav-link(href="/" class=!categoryActive ? "active" : "" class="link-dark" ) Acceuil
+                            
                             img(src='https://upload.wikimedia.org/wikipedia/fr/thumb/5/58/Reddit_logo_new.svg/1200px-Reddit_logo_new.svg.png' style="width:80px; height:40px" )
                            
        
        
         div.row
             div.col
+            .panel.panel-default
                 div.bg-light.p-5
                     if !logged
                          if errors
@@ -40,6 +23,7 @@ block body
                               h4=errors
                          form(method="POST" action="/signup")
                                div.p-2
+                               .panel-body
                                   label(for="mail") mail 
                                         img(class="rounded img-fluid" src="https://upload.wikimedia.org/wikipedia/commons/0/05/Aiga_mail.png"  style="width:40px; height:40px" )
                                        input(type="text" id="mail" name="mail")

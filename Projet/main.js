@@ -304,48 +304,20 @@ app.get('/post/:id', async (req, res) => {
     LEFT JOIN categories on categories.cat_id = posts.category
     WHERE id = ?
   `,[id])
-  //console.log(post.content)
-  const aviss = await db.get(`
-  SELECT like,dislike  FROM avis
-  WHERE id = ?
-`,[id])
-  console.log(aviss.like)
-
-  
-  const avis2 = await db.get(`
-    UPDATE avis
-    SET like = ?
-    WHERE id = ? 
-  `,[ aviss.like+1 , id])
-  console.log(req.body.like);
-  
-  
-  console.log(aviss.like)
-  res.render("post",{post: post, aviss: aviss, id: id})
-})
-
-app.post('/like/:id', async (req, res) => {
-  const db = await openDb()
-  const id = req.params.id
-  //console.log(id)
-  
   const aviss = await db.get(`
     SELECT like,dislike  FROM avis
     WHERE id = ?
   `,[id])
-  //console.log(aviss.like)
-  const avis2s = await db.get(`
-    UPDATE avis
-    SET like = ?
-    WHERE id = ? 
-  `,[ aviss.like+1 , id])
-  //console.log(req.body.like);
-  
-  console.log(aviss.like)
-  res.redirect('/post/:id')
+  const data = {
+    like:aviss.like,
+    dislike:aviss.dislike
+
+}
+
+  res.render("post",{post: post, data})
 })
 
-app.get('/dislike', async (req, res) => {
+app.post('/like/:id', async (req, res) => {
   const db = await openDb()
   const id = req.params.id
   console.log(id)
@@ -357,13 +329,36 @@ app.get('/dislike', async (req, res) => {
   //console.log(aviss.like)
   const avis2s = await db.get(`
     UPDATE avis
-    SET dislike = ?
+    SET like = ?
     WHERE id = ? 
-  `,[ aviss.dislike-1 , id])
+  `,[ aviss.like+1 , id])
   //console.log(req.body.like);
   
   console.log(aviss.like)
-  res.redirect('/post/:id')
+  res.redirect('/post/'+id /*,{avis : aviss} */)
+})
+
+app.get('/dislike/:id', async (req, res) => {
+  const db = await openDb()
+  const id = req.params.id
+  console.log(id)
+  
+  const aviss = await db.get(`
+    SELECT like,dislike,dislikemis,likemis  FROM avis
+    WHERE id = ?
+  `,[id])
+  //console.log(aviss.like)
+  if (aviss.dislikemis==0){
+  const avis2s = await db.get(`
+    UPDATE avis
+    SET dislike = ?
+    SET dislikemis= ?
+    WHERE id = ? 
+  `,[ aviss.dislike+1 ,aviss.dislikemis+1, id])}
+  //console.log(req.body.like);
+  
+  console.log(aviss.dislike)
+  res.redirect('/post/'+id)
 })
 
 
