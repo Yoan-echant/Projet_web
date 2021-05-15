@@ -42,28 +42,53 @@ block body
 
         div.row
             div.col
-                 .panel.panel-default
-                    .panel-heading      
+                 
+                    
                      span.badge.rounded-pill.bg-primary=post.cat_name
                      span.badge.rounded-pill.bg-secondary author
                      span.badge.rounded-pill.bg-secondary 01/01/01
-                     .panel-body
+                     
                      p=post.content
-                      div.col-3
+                      div.row
                             div.p-2
-                                form(action="/commentaire" method="GET")
-                                            input(type="Submit" value="Ajouter un commentaire")
-                            div.p-2             
-                                form(action="/post/" + post.id + "/edit" method="GET")
-                                         input(type="Submit" value="Editer") 
-                            p= 'nombre de like : ' + data.like  
+                                .row 
+                                    div.col-2
+                                        form(action="/commentaire/"+post.id method="GET")
+                                                    input(type="Submit" value="Ajouter un commentaire")
+                                    div.col-2
+                                        form(action="/post/" + post.id + "/edit" method="GET")
+                                                input(type="Submit" value="Editer") 
+                             
                             div.p-2
-                                form(action="/like/" +post.id method="POST")
-                                            input(name= "like" type="image" src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Facebook_Like_button.svg/1200px-Facebook_Like_button.svg.png" style="width:80px; height:60px" value="Like")
-                            p= 'nombre de dislike :' + data.dislike  
-                            div.p-2
-                                form(action="/dislike/"+post.id method="GET")
-                                            input(name= "dislike" type="image" src="https://proofmart.com/wp-content/uploads/2020/09/dislike-thumb-product.png" style="width:80px; height:60px" value="Dislike")
+                                div.row
+                                    div.col-2
+                                         p= 'nombre de like : ' + data.like 
+                                         form(action="/like/" +post.id method="POST")
+                                                        input(name= "like" type="image" src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Facebook_Like_button.svg/1200px-Facebook_Like_button.svg.png" style="width:80px; height:60px" value="Like")
+                                    div.col-2
+                                         p= 'nombre de dislike :' + data.dislike
+                                         form(action="/dislike/"+post.id method="GET")
+                                                        input(name= "dislike" type="image" src="https://proofmart.com/wp-content/uploads/2020/09/dislike-thumb-product.png" style="width:80px; height:60px" value="Dislike")
+                              
                             
+                            form(action="/commentaire/"+post.id method="POST")
+                                div.p-2
+                                p='name :'
+                                input(name="name")
+                                div.p-2
+                                p='content :'
+                                input(name="content")
+                                div.p-2
+                                input(type="submit" value="Ajoutez commentaire")
+                            
+                          .p-4  
+                            h2 Les commentaires :  
+                          .p-2  
+                            p='objet : '  + commentaire2.name
+                          .p-2      
+                            p=commentaire2.content                        
+                 
+   
+                           
                 
                          

@@ -237,7 +237,7 @@ app.get('/commentaires2', async (req, res) => {
 })
 
 
-app.get('/commentaire', async (req, res) => {
+/*app.get('/commentaire', async (req, res) => {
   if(!req.session.logged){
     res.redirect(302,'/login')
     return
@@ -255,34 +255,33 @@ app.get('/commentaire', async (req, res) => {
   
   res.render("commentaires", data)
 })
+*/
 
-
-app.post('/commentaire', async (req, res) => {
+app.post('/commentaire/:id', async (req, res) => {
   if(!req.session.logged){
     res.redirect(302,'/login')
     return
   }
-
+  console.log("salut")
   const db = await openDb()
-  const id = 1
- /* const post = await db.get(`
-    SELECT category FROM posts
-    LEFT JOIN categories on categories.cat_id = posts.category
-    WHERE id = ?
-  `,[id])*/
+  const id = req.params.id
+ 
   const name = req.body.name
   const content = req.body.content
+
+ 
   
   const article = id
   console.log(req.params.id)
   const commdate = await db.run(`
     INSERT INTO commentaires(name,content,article)
     VALUES(?, ?, ?)
-  `,[name, content, article])
+  
+  `,[name, content, article, id])
   console.log("post commentaire : ")
   console.log(commdate)
   
-  res.redirect(302,"/commentaire ")
+  res.redirect('/post/'+id)
 })
 
 /*app.get('/commentaire/edit', async (req, res) => {
@@ -351,13 +350,21 @@ app.get('/post/:id', async (req, res) => {
     SELECT like,dislike  FROM avis
     WHERE id = ?
   `,[id])
+  const commentaire = await db.get(`
+    SELECT * FROM commentaires 
+    WHERE id = ?
+  `,[id]) 
+  const commentaire2 = {
+    name:commentaire.name,
+    content:commentaire.content
+  }
   const data = {
     like:aviss.like,
     dislike:aviss.dislike
 
 }
 
-  res.render("post",{post: post, data})
+  res.render("post",{post: post, data, commentaire2})
 })
 
 app.post('/like/:id', async (req, res) => {
