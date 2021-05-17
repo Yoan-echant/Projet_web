@@ -364,8 +364,8 @@ app.get('/post/:id', async (req, res) => {
     console.log("On set a 0")
   }
   else {
-    console.log("On set depuis la bdd a:", avisuser.etat)
-    currentavis = avisuser.etat
+    console.log("On set depuis la bdd a:", aviuser.etat)
+    currentavis = aviuser.etat
   }
   console.log(commentaire)
   const commentaire_content= commentaire.content
