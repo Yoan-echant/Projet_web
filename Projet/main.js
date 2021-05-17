@@ -408,7 +408,6 @@ app.post('/like/:id', async (req, res) => {
         INSERT INTO liketab(user, article, etat)
         VALUES(?, ?, ?)
       `,[ numuser, id, 1])
-      const aviuserprecedent=0
     }
     else{
       if (aviuserprecedent.etat == 2){ // Si on like un poste qu'on avait disliké
@@ -478,7 +477,6 @@ app.get('/dislike/:id', async (req, res) => {
         INSERT INTO liketab(user, article, etat)
         VALUES(?, ?, ?)
       `,[ numuser, id, 1])
-      const aviuserprecedent = 0
     }
     else {
       console.log(aviuserprecedent)
