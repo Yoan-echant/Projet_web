@@ -277,7 +277,7 @@ app.post('/commentaire/:id', async (req, res) => {
     INSERT INTO commentaires(name,content,article)
     VALUES(?, ?, ?)
   
-  `,[name, content, article, id])
+  `,[name, content, article])
   console.log("post commentaire : ")
   console.log(commdate)
   
@@ -352,7 +352,7 @@ app.get('/post/:id', async (req, res) => {
   `,[id])
   const commentaire = await db.get(`
     SELECT * FROM commentaires 
-    WHERE id = ?
+    WHERE article = ?
   `,[id]) 
   const commentaire2 = {
     name:commentaire.name,
