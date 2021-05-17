@@ -83,11 +83,12 @@ block body
                             
                           .p-4  
                             h2 Les commentaires :  
-                          .p-2  
-                            p='objet : '  + commentaire2.name
-                          .p-2      
-                            p=commentaire2.content                        
-                 
+                            each i in array_com
+                                .p-2  
+                                    p='objet : '  + commentaire_name[i]
+                                .p-2      
+                                    p=commentaire_content[i]                        
+                        
    
                            
                 

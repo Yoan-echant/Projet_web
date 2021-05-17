@@ -341,6 +341,7 @@ app.post('/post/create', async (req, res) => {
 app.get('/post/:id', async (req, res) => {
   const db = await openDb()
   const id = req.params.id
+  const numuser = req.session.numuser
   const post = await db.get(`
     SELECT * FROM posts
     LEFT JOIN categories on categories.cat_id = posts.category
@@ -350,64 +351,176 @@ app.get('/post/:id', async (req, res) => {
     SELECT like,dislike  FROM avis
     WHERE id = ?
   `,[id])
+  const aviuser = await db.get(`
+    SELECT etat  FROM liketab
+    WHERE user = ? AND article = ?
+  `,[numuser, id])
   const commentaire = await db.get(`
     SELECT * FROM commentaires 
     WHERE article = ?
   `,[id]) 
-  const commentaire2 = {
-    name:commentaire.name,
-    content:commentaire.content
+  let currentavis = 0
+  if (typeof(aviuser) == typeof(unevariablenondéfinie)){
+    console.log("On set a 0")
   }
+  else {
+    console.log("On set depuis la bdd a:", avisuser.etat)
+    currentavis = avisuser.etat
+  }
+  console.log(commentaire)
+  const commentaire_content= commentaire.content
+  console.log(commentaire_content)
+  const commentaire_name= commentaire.name
+  console.log(commentaire_name)
+  const commentaire_nb = commentaire_content.length
+  console.log(commentaire_nb)
+  const array_com = Array.from({ length: commentaire_nb }, (_, i) => i+1)
+  console.log(array_com)
   const data = {
     like:aviss.like,
-    dislike:aviss.dislike
-
+    dislike:aviss.dislike,
+    useropinion: currentavis
 }
 
-  res.render("post",{post: post, data, commentaire2})
+  res.render("post",{post: post, numuser: numuser, logged: req.session.logged, data, commentaire_name, commentaire_content, commentaire_nb, array_com})
 })
 
 app.post('/like/:id', async (req, res) => {
   const db = await openDb()
   const id = req.params.id
-  console.log(id)
+  const numuser = req.session.numuser
+  const logged = req.session.logged
   
-  const aviss = await db.get(`
-    SELECT like,dislike  FROM avis
-    WHERE id = ?
-  `,[id])
-  //console.log(aviss.like)
-  const avis2s = await db.get(`
-    UPDATE avis
-    SET like = ?
-    WHERE id = ? 
-  `,[ aviss.like+1 , id])
+  if (logged){
+    const aviss = await db.get(`
+      SELECT like,dislike  FROM avis
+      WHERE id = ?
+    `,[id])
+    let nblike = aviss.like +1
+
+    const aviuserprecedent = await db.get(`
+      SELECT etat FROM liketab
+      WHERE article = ? AND user= ?
+    `,[id, numuser])
+
+    if (typeof(aviuserprecedent) == typeof(unevariablenondéfinie)){// Si on était jamais venue sur la page
+      const création_avis = await db.get(`
+        INSERT INTO liketab(user, article, etat)
+        VALUES(?, ?, ?)
+      `,[ numuser, id, 1])
+      aviuserprecedent=0
+    }
+    else{
+      if (aviuserprecedent.etat == 2){ // Si on like un poste qu'on avait disliké
+        const avis2s = await db.get(`
+          UPDATE avis
+          SET dislike = ?
+          WHERE id = ? 
+        `,[ aviss.dislike-1 , id])
+        const avisuser = await db.get(`
+          UPDATE liketab
+          SET etat = ?
+          WHERE article = ? AND user = ?
+        `,[ 1 , id, numuser])
+      }
+      else if(aviuserprecedent.etat== 1){
+        const avisuser = await db.get(`
+          UPDATE liketab
+          SET etat = ?
+          WHERE article = ? AND user = ?
+        `,[ 0 , id, numuser])
+        nblike = nblike-2
+      }
+      if (aviuserprecedent.etat==0){
+        const avisuser = await db.get(`
+          UPDATE liketab
+          SET etat = ?
+          WHERE article = ? AND user = ?
+      `,[ 1 , id, numuser])
+      }
+    }
+    const avis2s = await db.get(`
+      UPDATE avis
+      SET like = ?
+      WHERE id = ? 
+    `,[ nblike, id])
+
+  } 
   //console.log(req.body.like);
-  
-  console.log(aviss.like)
+  else{
+    console.log("Erreur, vous n'êtes pas connecté")
+  }
   res.redirect('/post/'+id /*,{avis : aviss} */)
 })
 
 app.get('/dislike/:id', async (req, res) => {
   const db = await openDb()
   const id = req.params.id
-  console.log(id)
-  
-  const aviss = await db.get(`
-    SELECT like,dislike,dislikemis,likemis  FROM avis
-    WHERE id = ?
-  `,[id])
-  //console.log(aviss.like)
-  if (aviss.dislikemis==0){
-  const avis2s = await db.get(`
-    UPDATE avis
-    SET dislike = ?
-    SET dislikemis= ?
-    WHERE id = ? 
-  `,[ aviss.dislike+1 ,aviss.dislikemis+1, id])}
-  //console.log(req.body.like);
-  
-  console.log(aviss.dislike)
+  const numuser = req.session.numuser
+  const logged = req.session.logged
+
+    if (logged) {
+    const aviss = await db.get(`
+      SELECT like,dislike  FROM avis
+      WHERE id = ?
+    `,[id])
+    let nbdis= aviss.dislike+1
+    const aviuserprecedent = await db.get(`
+      SELECT *  FROM liketab
+      WHERE article = ? AND user= ?
+    `,[id, numuser])
+    
+    console.log("état", typeof(aviuserprecedent))
+
+    if (typeof(aviuserprecedent) == typeof(unevariablenondéfinie)){// Si on était jamais venue sur la page
+      console.log("On est entré")
+      const création_avis = await db.get(`
+        INSERT INTO liketab(user, article, etat)
+        VALUES(?, ?, ?)
+      `,[ numuser, id, 1])
+      const aviuserprecedent = 0
+    }
+    else {
+      console.log(aviuserprecedent)
+      if (aviuserprecedent.etat == 1){ // Si on like un poste qu'on avait disliké
+        const avis2s = await db.get(`
+          UPDATE avis
+          SET like = ?
+          WHERE id = ? 
+        `,[ aviss.like-1 , id])
+        const avisuser = await db.get(`
+          UPDATE liketab
+          SET etat = ?
+          WHERE article = ? AND user = ?
+        `,[ 2 ,id ,numuser])
+      }
+      if(aviuserprecedent.etat == 2){
+        const avisuser = await db.get(`
+        UPDATE liketab
+        SET etat = ?
+        WHERE article = ? AND user = ?
+      `,[ 0 , id, numuser])
+      nbdis =nbdis -2
+      }
+      if (aviuserprecedent.etat ==0){
+        console.log("on change la valeur")
+        const avisuser = await db.get(`
+          UPDATE liketab
+          SET etat = ?
+          WHERE article = ? AND user = ?
+        `,[ 2 , id, numuser])
+      }
+    }
+    const avis2s = await db.get(`
+      UPDATE avis
+      SET dislike = ?
+      WHERE id = ? 
+    `,[nbdis , id])
+    //console.log(req.body.like);s
+  }
+  else {
+    console.log("Erreur, vous n'êtes pas connecté")
+  }
   res.redirect('/post/'+id)
 })
 
