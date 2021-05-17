@@ -357,7 +357,7 @@ app.get('/post/:id', async (req, res) => {
   `,[numuser, id])
   const commentaire = await db.get(`
     SELECT * FROM commentaires 
-    WHERE id = ?
+    WHERE article = ?
   `,[id]) 
   let currentavis = 0
   if (typeof(aviuser) == typeof(unevariablenondéfinie)){

@@ -34,13 +34,11 @@ async function createPosts(db){
     name: "Article 1",
     content: "Lorem lipsum, Lorem lipsum Lorem lipsum Lorem lipsum",
     category: 1,
-    article: 1
   },
     {
       name: "Article 2",
       content: "Lorem lipsum, Lorem lipsum Lorem lipsum Lorem lipsum",
       category: 2,
-      article: 1
     }
   ]
   return await Promise.all(contents.map(post => {
