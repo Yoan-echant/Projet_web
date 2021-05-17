@@ -55,7 +55,7 @@ async function createCommentaire(db){
   },
   {
     name: "Commentaire 2",
-    content: "Lorem lipsum, Lorem lipsum Lorem lipsum Lorem lipsum",
+    content: "Un autre com",
     article: 1
   }, 
   {
