@@ -359,17 +359,30 @@ app.get('/post/:id', async (req, res) => {
     SELECT * FROM commentaires 
     WHERE id = ?
   `,[id]) 
-  const commentaire2 = {
-    name:commentaire.name,
-    content:commentaire.content
+  let currentavis = 0
+  if (typeof(aviuser) == typeof(unevariablenondéfinie)){
+    console.log("On set a 0")
   }
+  else {
+    console.log("On set depuis la bdd a:", avisuser.etat)
+    currentavis = avisuser.etat
+  }
+  console.log(commentaire)
+  const commentaire_content= commentaire.content
+  console.log(commentaire_content)
+  const commentaire_name= commentaire.name
+  console.log(commentaire_name)
+  const commentaire_nb = commentaire_content.length
+  console.log(commentaire_nb)
+  const array_com = Array.from({ length: commentaire_nb }, (_, i) => i+1)
+  console.log(array_com)
   const data = {
     like:aviss.like,
     dislike:aviss.dislike,
-    useropinion: aviuser.etat
+    useropinion: currentavis
 }
 
-  res.render("post",{post: post, numuser: numuser, logged: req.session.logged, data, commentaire2})
+  res.render("post",{post: post, numuser: numuser, logged: req.session.logged, data, commentaire_name, commentaire_content, commentaire_nb, array_com})
 })
 
 app.post('/like/:id', async (req, res) => {
