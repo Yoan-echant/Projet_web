@@ -1,6 +1,6 @@
 const {openDb} = require("./db")
 
-const tablesNames = ["categories","posts","userdata", "commentaires", "avis", "visite"]
+const tablesNames = ["categories","posts","userdata", "commentaires", "avis", "visite", "liketab"]
 
 
 
@@ -71,15 +71,11 @@ async function createAvis(db){
   const avis = [{
     dislike: 1,
     like: 3,
-    dislikemis: 0,
-    likemis: 0,
     article: 1
   }, 
   {
     dislike: 4,
     like: 0,
-    dislikemis: 0,
-    likemis: 0,
     article: 2
     
   }
@@ -98,6 +94,19 @@ async function createVisite(db){
   ]
   return await Promise.all( visite.map(vis => {
     return insertRequest.run([vis.user, vis.article])
+  }))
+}
+
+async function createLiketab(db){
+  const insertRequest = await db.prepare("INSERT INTO liketab(user, article, etat) VALUES(?, ?, ?)")
+  const like = [{
+    user: 3,
+    article: 1,
+    etat: 0 //0 neutre, 1 like, 2 dislike
+  }
+  ]
+  return await Promise.all( like.map(like => {
+    return insertRequest.run([like.user, like.article, like.etat])
   }))
 }
 
@@ -140,8 +149,6 @@ async function createTables(db){
           id INTEGER PRIMARY KEY,
           dislike int,
           like int,
-          dislikemis int,
-          likemis int,
           article int
         )
 `)
@@ -149,10 +156,20 @@ const visite = db.run(`
         CREATE TABLE IF NOT EXISTS visite(
           id INTEGER PRIMARY KEY,
           user int,
-          article int
+          article int,
+          FOREIGN KEY(article) REFERENCES post(id)
         )
   `)
-  return await Promise.all([cat, post, users, commentaire, avis, visite])
+  const liketab = db.run(`
+        CREATE TABLE IF NOT EXISTS liketab(
+          id INTEGER PRIMARY KEY,
+          user int,
+          article int,
+          etat int,
+          FOREIGN KEY(article) REFERENCES post(id)
+        )
+  `)
+  return await Promise.all([cat, post, users, commentaire, avis, visite, liketab])
 }
 
 
@@ -176,4 +193,5 @@ async function dropTables(db){
   await createCommentaire(db)
   await createAvis(db)
   await createVisite(db)
+  await createLiketab(db)
 })()
