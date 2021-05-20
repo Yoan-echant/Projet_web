@@ -277,7 +277,7 @@ app.post('/commentaire/:id', async (req, res) => {
     INSERT INTO commentaires(name,content,article)
     VALUES(?, ?, ?)
   
-  `,[name, content, article, id])
+  `,[name, content, article])
   console.log("post commentaire : ")
   console.log(commdate)
   
@@ -355,27 +355,36 @@ app.get('/post/:id', async (req, res) => {
     SELECT etat  FROM liketab
     WHERE user = ? AND article = ?
   `,[numuser, id])
-  const commentaire = await db.get(`
-    SELECT * FROM commentaires 
+  
+  const commentaire = await db.all(`
+    SELECT name,content FROM commentaires 
     WHERE article = ?
   `,[id]) 
+ 
   let currentavis = 0
   if (typeof(aviuser) == typeof(unevariablenondéfinie)){
-    console.log("On set a 0")
+    //console.log("On set a 0")
   }
   else {
-    console.log("On set depuis la bdd a:", aviuser.etat)
+    //console.log("On set depuis la bdd a:", aviuser.etat)
     currentavis = aviuser.etat
   }
-  console.log(commentaire)
-  const commentaire_content= commentaire.content
+
+  const commentaire_nb = commentaire.length
+  let commentaire_content =Array.from({ length: commentaire_nb }, (_, i) => i)
+  let commentaire_name =Array.from({ length: commentaire_nb }, (_, i) => i)
+
+  for (let k = 0; k < commentaire_nb; k++){
+    console.log(commentaire[k])
+    commentaire_content[k]= commentaire[k].content
+    commentaire_name[k]= commentaire[k].name
+  }
+  
   console.log(commentaire_content)
-  const commentaire_name= commentaire.name
   console.log(commentaire_name)
-  const commentaire_nb = commentaire_content.length
-  console.log(commentaire_nb)
+  
   const array_com = Array.from({ length: commentaire_nb }, (_, i) => i+1)
-  console.log(array_com)
+  //console.log(array_com)
   const data = {
     like:aviss.like,
     dislike:aviss.dislike,

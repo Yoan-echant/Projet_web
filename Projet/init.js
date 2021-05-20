@@ -51,18 +51,18 @@ async function createCommentaire(db){
   const commentaire = [{
     name: "Commentaire 1",
     content: "Lorem lipsum, Lorem lipsum Lorem lipsum Lorem lipsum",
-    article: 1
+    article: 1,
   },
-  {
-    name: "Commentaire 2",
-    content: "Un autre com",
-    article: 1
-  }, 
-  {
-    name: "Commentaire 2",
-    content: "Lorem lipsum, Lorem lipsum Lorem lipsum Lorem lipsum",
-    article: 2
-  }
+    {
+      name: "Commentaire 2 x 1",
+      content: "Un autre com",
+      article: 1,
+    }, 
+    {
+      name: "Commentaire 2",
+      content: "Lorem lipsum, Lorem lipsum Lorem lipsum Lorem lipsum",
+      article: 2,
+    }
   ]
   return await Promise.all( commentaire.map(comm => {
     return insertRequest.run([comm.name, comm.content, comm.article])
@@ -152,7 +152,8 @@ async function createTables(db){
           id INTEGER PRIMARY KEY,
           dislike int,
           like int,
-          article int
+          article int,
+          FOREIGN KEY(article) REFERENCES post(id)
         )
 `)
 const visite = db.run(`
