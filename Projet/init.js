@@ -13,14 +13,16 @@ async function createCategories(db){
 }
 
 async function createUserdata(db){
-  const insertRequest = await db.prepare("INSERT INTO userdata(username,password) VALUES(?, ?)")
+  const insertRequest = await db.prepare("INSERT INTO userdata(username, password, mail) VALUES(?, ?, ?)")
   const data = [{
     username:"username",
     password: "password",
+    mail: "username@adressemail.pif"
    },
     {
      username:"admin",
      password: "admin",
+     mail: "admin@adressemail.pif"
     }
   ]
   return await Promise.all(data.map(users => {
@@ -134,7 +136,8 @@ async function createTables(db){
         CREATE TABLE IF NOT EXISTS userdata(
           id INTEGER PRIMARY KEY,
           username varchar(255),
-          password varchar(255)
+          password varchar(255),
+          mail varchar(255)
         )
   `)
 
