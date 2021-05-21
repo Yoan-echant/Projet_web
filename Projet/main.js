@@ -443,13 +443,14 @@ app.post('/post/create', async (req, res) => {
 
   const db = await openDb()
   const id = req.params.id
+  const iduser = req.session.numuser
   const name = req.body.name
   const content = req.body.content
   const category = req.body.category
   const post = await db.run(`
-    INSERT INTO posts(name,content,category)
-    VALUES(?, ?, ?)
-  `,[name, content, category])
+    INSERT INTO posts(name,content,category, auteur)
+    VALUES(?, ?, ?, ?)
+  `,[name, content, category, iduser])
   console.log("post create post : ")
   console.log(post)
   res.redirect("/post/" + post.lastID)
@@ -685,6 +686,8 @@ app.get('/post/:id/edit', async (req, res) => {
     LEFT JOIN categories on categories.cat_id = posts.category
     WHERE id = ?
   `,[id])
+  console.log("requete de : "+ iduser)
+  console.log(post)
   if (post.auteur == iduser){
     res.render("post-edit",{post: post, categories: categories})
   }
