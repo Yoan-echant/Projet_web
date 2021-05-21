@@ -26,70 +26,77 @@ async function createUserdata(db){
     }
   ]
   return await Promise.all(data.map(users => {
-    return insertRequest.run([users.username, users.password])
+    return insertRequest.run([users.username, users.password, users.mail])
   }))
 }
 
 async function createPosts(db){
-  const insertRequest = await db.prepare("INSERT INTO posts(name, content, category) VALUES(?, ?, ?)")
+  const insertRequest = await db.prepare("INSERT INTO posts(name, content, category, auteur) VALUES(?, ?, ?, ?)")
   const contents = [{
     name: "Telecom",
     content: "Lien :  Les télécommunications sont définies comme la transmission d’informations à distance en utilisant des technologies électronique, informatique, de transmission filaire, optique ou électromagnétique. Ce terme a un sens plus large que son acception équivalente officielle « communication électronique ». Elles se distinguent ainsi de la poste qui transmet des informations ou des objets sous forme physique. ",
     category: 1,
-    lien: "https://fr.wikipedia.org/wiki/T%C3%A9l%C3%A9communications"
+    lien: "https://fr.wikipedia.org/wiki/T%C3%A9l%C3%A9communications",
+    auteur: 2
   },
   {
     name: "Communication numérique",
     content: "  Les télécommunications sont définies comme la transmission d’informations à distance en utilisant des technologies électronique, informatique, de transmission filaire, optique ou électromagnétique. Ce terme a un sens plus large que son acception équivalente officielle « communication électronique ». Elles se distinguent ainsi de la poste qui transmet des informations ou des objets sous forme physique. ",
     category: 1,
-    lien: "https://fr.wikipedia.org/wiki/T%C3%A9l%C3%A9communications"
+    lien: "https://fr.wikipedia.org/wiki/T%C3%A9l%C3%A9communications",
+    auteur: 2
   },
   {
     name: "Telecom",
     content: "Les télécommunications sont définies comme la transmission d’informations à distance en utilisant des technologies électronique, informatique, de transmission filaire, optique ou électromagnétique. Ce terme a un sens plus large que son acception équivalente officielle « communication électronique ». Elles se distinguent ainsi de la poste qui transmet des informations ou des objets sous forme physique. ",
     category: 2,
-    lien: "https://fr.wikipedia.org/wiki/T%C3%A9l%C3%A9communications"
+    lien: "https://fr.wikipedia.org/wiki/T%C3%A9l%C3%A9communications",
+    auteur: 2,
   },
     {
       name: "Article 2",
       content: "Lorem lipsum, Lorem lipsum Lorem lipsum Lorem lipsum",
       category: 2,
-      lien: "https://fr.wikipedia.org/wiki/T%C3%A9l%C3%A9communications"
+      lien: "https://fr.wikipedia.org/wiki/T%C3%A9l%C3%A9communications",
+      auteur: 2,
     }
   ]
   return await Promise.all(contents.map(post => {
-    return insertRequest.run([post.name, post.content, post.category])
+    return insertRequest.run([post.name, post.content, post.category, post.auteur])
   }))
 }
 
 async function createCommentaire(db){
-  const insertRequest = await db.prepare("INSERT INTO commentaires(name, content, article, iduser) VALUES(?, ?, ?, ?)")
+  const insertRequest = await db.prepare("INSERT INTO commentaires(name, content, article, iduser, numcom) VALUES(?, ?, ?, ?, ?)")
   const commentaire = [{
     name: "Commentaire 1",
     content: "Lorem lipsum, Lorem lipsum Lorem lipsum Lorem lipsum",
     article: 1,
-    iduser: 2
+    iduser: 2,
+    numcom: 1,
   },
     {
       name: "Commentaire 2 x 1",
       content: "Un autre com",
       article: 1,
-      iduser: 2
+      iduser: 2,
+      numcom: 2,
     }, 
     {
       name: "Commentaire 2",
       content: "Lorem lipsum, Lorem lipsum Lorem lipsum Lorem lipsum",
       article: 2,
-      iduser: 1
+      iduser: 1,
+      numcom: 1,
     }
   ]
   return await Promise.all( commentaire.map(comm => {
-    return insertRequest.run([comm.name, comm.content, comm.article])
+    return insertRequest.run([comm.name, comm.content, comm.article, comm.iduser, comm.numcom])
   }))
 }
 
 async function createAvis(db){
-  const insertRequest = await db.prepare("INSERT INTO avis(dislike, like) VALUES(?, ?)")
+  const insertRequest = await db.prepare("INSERT INTO avis(dislike, like, article) VALUES(?, ?, ?)")
   const avis = [{
     dislike: 0,
     like: 0,
@@ -113,7 +120,7 @@ async function createAvis(db){
   }
   ]
   return await Promise.all( avis.map(av => {
-    return insertRequest.run([av.dislike, av.like])
+    return insertRequest.run([av.dislike, av.like, av.article])
   }))
 }
 
@@ -157,7 +164,9 @@ async function createTables(db){
           content text,
           lien text,
           article int,
-          FOREIGN KEY(category) REFERENCES categories(cat_id)
+          auteur int,
+          FOREIGN KEY(category) REFERENCES categories(cat_id),
+          FOREIGN KEY(auteur) REFERENCES users(id)
         )
   `)
   const users = db.run(`
@@ -176,6 +185,7 @@ async function createTables(db){
           content text,
           article int,
           iduser int,
+          numcom int,
           FOREIGN KEY(article) REFERENCES post(id),
           FOREIGN KEY(iduser) REFERENCES user(id)
         )
