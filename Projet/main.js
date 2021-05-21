@@ -125,6 +125,7 @@ app.post('/signup',async (req, res) => {
   if (
     username.length < 4
   ){
+    test = 1
     data = {
       errors: "Le nom d'utilisateur est trop court, il doit faire au moins 4 caractères",
       logged: false
@@ -133,6 +134,7 @@ app.post('/signup',async (req, res) => {
   }else if (
     password.length < 6
   ){
+    test = 1
     data = {
       errors: "Le mot de passe est trop court, il doit faire au moins 6 caractères",
       logged: false
@@ -141,6 +143,7 @@ app.post('/signup',async (req, res) => {
   }else if (
     !mail.match(/[a-z0-9_\-\.]+@[a-z0-9_\-\.]+\.[a-z]+/i)
   ){
+    test = 1
     data = {
       errors: "Le format de l'adresse mail n'est pas valide",
       logged: false
@@ -181,11 +184,11 @@ app.post('/signup',async (req, res) => {
       res.render('signup',data)
     }
   }if (
-    test ==0
+    test == 0
   ){
-    console.log("username: "+ username +"   "+"mdp: "+ password)
+    console.log("username: "+ username +"   "+"mdp: "+ password + " mail " + mail)
     const add_users =await db.run(`
-      INSERT INTO userdata(username,password, mail)
+      INSERT INTO userdata(username, password, mail)
       VALUES(?, ?, ?)
     `,[username, password, mail])
     res.redirect(302,'/login')
@@ -300,7 +303,7 @@ app.post('/commentaire/:id', async (req, res) => {
   console.log("salut")
   const db = await openDb()
   const id = req.params.id
- 
+  const iduser = req.session.numuser
   const name = req.body.name
   const content = req.body.content
 
@@ -309,16 +312,39 @@ app.post('/commentaire/:id', async (req, res) => {
   const article = id
   console.log(req.params.id)
   const commdate = await db.run(`
-    INSERT INTO commentaires(name,content,article)
-    VALUES(?, ?, ?)
+    INSERT INTO commentaires(name, content, article, iduser)
+    VALUES(?, ?, ?, ?)
   
-  `,[name, content, article])
+  `,[name, content, article, iduser])
   console.log("post commentaire : ")
   console.log(commdate)
   
   res.redirect('/post/'+id)
 })
 
+app.post('/commentaire/:id/delete/:idcom', async (req, res) => {
+  if(!req.session.logged){
+    res.redirect(302,'/login')
+    return
+  }
+  console.log("salut")
+  const db = await openDb()
+  const id = req.params.id
+  const iduser = req.session.numuser
+  const numcom = req.params.idcom
+ 
+  
+  const article = id
+  console.log(req.params.id)
+  const commdate = await db.run(`
+    DELETE FROM commentaires
+    WHERE article = ? AND numcom = ?
+  `,[article, numcom])
+  console.log("post commentaire : ")
+  console.log(commdate)
+  
+  res.redirect('/post/'+id)
+})
 /*app.get('/commentaire/edit', async (req, res) => {
   
 */
