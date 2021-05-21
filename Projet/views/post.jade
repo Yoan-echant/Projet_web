@@ -83,12 +83,14 @@ block body
                             
                           .p-4  
                             h2 Les commentaires :  
-                            each i in array_com
+                            each idcom in array_com
                                 .p-2  
-                                    p='objet : '  + commentaire_name[i-1]
+                                    p='objet : '  + commentaire_name[idcom-1]
                                 .p-2      
-                                    p=commentaire_content[i-1]                        
-                        
+                                    p=commentaire_content[idcom-1]                        
+                                    div.col-2
+                                        form(action="/commentaire/" + post.id + "/delete/" + idcom method="GET")
+                                                    input(type="Submit" value="Supprimer le commentaire")
    
                            
                 
