@@ -111,6 +111,7 @@ app.get('/signup',(req, res) => {
 })
 
 app.post('/signup',async (req, res) => {
+  const mail = req.body.mail
   const username = req.body.username
   const password = req.body.password
   const password_ver= req.body.password_ver
@@ -121,9 +122,43 @@ app.post('/signup',async (req, res) => {
   let test = 0
   let data = {
   }
+  if (
+    username.length < 4
+  ){
+    data = {
+      errors: "Le nom d'utilisateur est trop court, il doit faire au moins 4 caractères",
+      logged: false
+    }
+    res.render('signup',data)
+  }else if (
+    password.length < 6
+  ){
+    data = {
+      errors: "Le mot de passe est trop court, il doit faire au moins 6 caractères",
+      logged: false
+    }
+    res.render('signup',data)
+  }else if (
+    !mail.match(/[a-z0-9_\-\.]+@[a-z0-9_\-\.]+\.[a-z]+/i)
+  ){
+    data = {
+      errors: "Le format de l'adresse mail n'est pas valide",
+      logged: false
+    }
+    res.render('signup',data)
+  }else if (
+    password != password_ver
+  ){
+    test = 1
+    data = {
+      errors: "Veuillez entrer deux fois le même mot de passe",
+      logged: false
+    }
+  res.render('signup',data)
+  }
   for (let step=1; step < userdatas.length+1; step++ ){
     const users = await db.all(`
-      SELECT username FROM userdata
+      SELECT username,mail FROM userdata
       WHERE ID = ?
     `,[step])
     if(
@@ -136,11 +171,11 @@ app.post('/signup',async (req, res) => {
       }
       res.render('signup',data)
     }else if (
-      password != password_ver
+      mail == users[0].mail
     ){
       test = 1
       data = {
-        errors: "Veuillez entrer deux fois le même mot de passe",
+        errors: "Cette adresse mail est déja utilisé",
         logged: false
       }
       res.render('signup',data)
@@ -150,9 +185,9 @@ app.post('/signup',async (req, res) => {
   ){
     console.log("username: "+ username +"   "+"mdp: "+ password)
     const add_users =await db.run(`
-      INSERT INTO userdata(username,password)
-      VALUES(?, ?)
-    `,[username, password])
+      INSERT INTO userdata(username,password, mail)
+      VALUES(?, ?, ?)
+    `,[username, password, mail])
     res.redirect(302,'/login')
   }
 })
@@ -355,27 +390,36 @@ app.get('/post/:id', async (req, res) => {
     SELECT etat  FROM liketab
     WHERE user = ? AND article = ?
   `,[numuser, id])
-  const commentaire = await db.get(`
-    SELECT * FROM commentaires 
+  
+  const commentaire = await db.all(`
+    SELECT name,content FROM commentaires 
     WHERE article = ?
   `,[id]) 
+ 
   let currentavis = 0
   if (typeof(aviuser) == typeof(unevariablenondéfinie)){
-    console.log("On set a 0")
+    //console.log("On set a 0")
   }
   else {
-    console.log("On set depuis la bdd a:", avisuser.etat)
-    currentavis = avisuser.etat
+    //console.log("On set depuis la bdd a:", aviuser.etat)
+    currentavis = aviuser.etat
   }
-  console.log(commentaire)
-  const commentaire_content= commentaire.content
+
+  const commentaire_nb = commentaire.length
+  let commentaire_content =Array.from({ length: commentaire_nb }, (_, i) => i)
+  let commentaire_name =Array.from({ length: commentaire_nb }, (_, i) => i)
+
+  for (let k = 0; k < commentaire_nb; k++){
+    console.log(commentaire[k])
+    commentaire_content[k]= commentaire[k].content
+    commentaire_name[k]= commentaire[k].name
+  }
+
   console.log(commentaire_content)
-  const commentaire_name= commentaire.name
   console.log(commentaire_name)
-  const commentaire_nb = commentaire_content.length
-  console.log(commentaire_nb)
+  
   const array_com = Array.from({ length: commentaire_nb }, (_, i) => i+1)
-  console.log(array_com)
+  //console.log(array_com)
   const data = {
     like:aviss.like,
     dislike:aviss.dislike,
@@ -408,7 +452,6 @@ app.post('/like/:id', async (req, res) => {
         INSERT INTO liketab(user, article, etat)
         VALUES(?, ?, ?)
       `,[ numuser, id, 1])
-      aviuserprecedent=0
     }
     else{
       if (aviuserprecedent.etat == 2){ // Si on like un poste qu'on avait disliké
@@ -478,7 +521,6 @@ app.get('/dislike/:id', async (req, res) => {
         INSERT INTO liketab(user, article, etat)
         VALUES(?, ?, ?)
       `,[ numuser, id, 1])
-      const aviuserprecedent = 0
     }
     else {
       console.log(aviuserprecedent)

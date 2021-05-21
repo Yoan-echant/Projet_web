@@ -13,14 +13,16 @@ async function createCategories(db){
 }
 
 async function createUserdata(db){
-  const insertRequest = await db.prepare("INSERT INTO userdata(username,password) VALUES(?, ?)")
+  const insertRequest = await db.prepare("INSERT INTO userdata(username, password, mail) VALUES(?, ?, ?)")
   const data = [{
     username:"username",
     password: "password",
+    mail: "username@adressemail.pif"
    },
     {
      username:"admin",
      password: "admin",
+     mail: "admin@adressemail.pif"
     }
   ]
   return await Promise.all(data.map(users => {
@@ -51,18 +53,18 @@ async function createCommentaire(db){
   const commentaire = [{
     name: "Commentaire 1",
     content: "Lorem lipsum, Lorem lipsum Lorem lipsum Lorem lipsum",
-    article: 1
+    article: 1,
   },
-  {
-    name: "Commentaire 2",
-    content: "Lorem lipsum, Lorem lipsum Lorem lipsum Lorem lipsum",
-    article: 1
-  }, 
-  {
-    name: "Commentaire 2",
-    content: "Lorem lipsum, Lorem lipsum Lorem lipsum Lorem lipsum",
-    article: 2
-  }
+    {
+      name: "Commentaire 2 x 1",
+      content: "Un autre com",
+      article: 1,
+    }, 
+    {
+      name: "Commentaire 2",
+      content: "Lorem lipsum, Lorem lipsum Lorem lipsum Lorem lipsum",
+      article: 2,
+    }
   ]
   return await Promise.all( commentaire.map(comm => {
     return insertRequest.run([comm.name, comm.content, comm.article])
@@ -134,7 +136,8 @@ async function createTables(db){
         CREATE TABLE IF NOT EXISTS userdata(
           id INTEGER PRIMARY KEY,
           username varchar(255),
-          password varchar(255)
+          password varchar(255),
+          mail varchar(255)
         )
   `)
 
@@ -152,7 +155,8 @@ async function createTables(db){
           id INTEGER PRIMARY KEY,
           dislike int,
           like int,
-          article int
+          article int,
+          FOREIGN KEY(article) REFERENCES post(id)
         )
 `)
 const visite = db.run(`
