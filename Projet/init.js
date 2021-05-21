@@ -49,28 +49,31 @@ async function createPosts(db){
 }
 
 async function createCommentaire(db){
-  const insertRequest = await db.prepare("INSERT INTO commentaires(name, content, article, iduser) VALUES(?, ?, ?, ?)")
+  const insertRequest = await db.prepare("INSERT INTO commentaires(name, content, article, iduser, numcom) VALUES(?, ?, ?, ?, ?)")
   const commentaire = [{
     name: "Commentaire 1",
     content: "Lorem lipsum, Lorem lipsum Lorem lipsum Lorem lipsum",
     article: 1,
-    iduser: 2
+    iduser: 2,
+    numcom: 1,
   },
     {
       name: "Commentaire 2 x 1",
       content: "Un autre com",
       article: 1,
-      iduser: 2
+      iduser: 2,
+      numcom: 2,
     }, 
     {
       name: "Commentaire 2",
       content: "Lorem lipsum, Lorem lipsum Lorem lipsum Lorem lipsum",
       article: 2,
-      iduser: 1
+      iduser: 1,
+      numcom: 1,
     }
   ]
   return await Promise.all( commentaire.map(comm => {
-    return insertRequest.run([comm.name, comm.content, comm.article])
+    return insertRequest.run([comm.name, comm.content, comm.article, comm.iduser, comm.numcom])
   }))
 }
 
@@ -151,6 +154,7 @@ async function createTables(db){
           content text,
           article int,
           iduser int,
+          numcom int,
           FOREIGN KEY(article) REFERENCES post(id),
           FOREIGN KEY(iduser) REFERENCES user(id)
         )

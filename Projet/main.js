@@ -208,7 +208,7 @@ app.get('/tendance', async(req,res) =>{
     ORDER BY like DESC
   `)
  
-  console.log(posts)
+  //console.log(posts)
   res.render("tendance",{posts: posts,categories: categories, logged: req.session.logged, numuser: req.session.numuser})
 })
 
@@ -223,7 +223,7 @@ app.get('/visite', async(req,res) =>{
     res.redirect('/login')
   }
   numerouser = req.session.numuser
-  console.log(numerouser)
+  //console.log(numerouser)
   const db = await openDb()
   const categories = await db.all(`
     SELECT * FROM categories
@@ -234,7 +234,7 @@ app.get('/visite', async(req,res) =>{
     INNER JOIN visite on visite.article = posts.id
     WHERE user= ?
   `,[numerouser])
-  console.log(posts)
+  //console.log(posts)
   res.render("visite",{posts: posts,categories: categories, logged: req.session.logged, numuser: req.session.numuser})
 })
 
@@ -245,7 +245,7 @@ app.post('/visite', async(req,res) =>{
 
 
 app.get('/logout',(req, res) => {
-  console.log(req.session.logged)
+  //console.log(req.session.logged)
  if (req.session.logged = false){
     res.redirect(302,'/login')
  }else {
@@ -300,34 +300,38 @@ app.post('/commentaire/:id', async (req, res) => {
     res.redirect(302,'/login')
     return
   }
-  console.log("salut")
+  //console.log("salut")
   const db = await openDb()
   const id = req.params.id
   const iduser = req.session.numuser
   const name = req.body.name
   const content = req.body.content
 
+  const numcomliste = await db.all(`
+    SELECT id FROM commentaires
+    WHERE article = ?
+  `,[id])
  
-  
+  const numcom = numcomliste.length + 1
   const article = id
-  console.log(req.params.id)
+
+  //console.log("article:"+ id +" utilisateur:"+ iduser + " commentaire:" + numcom)
+
   const commdate = await db.run(`
-    INSERT INTO commentaires(name, content, article, iduser)
-    VALUES(?, ?, ?, ?)
+    INSERT INTO commentaires(name, content, article, iduser, numcom)
+    VALUES(?, ?, ?, ?, ?)
   
-  `,[name, content, article, iduser])
-  console.log("post commentaire : ")
-  console.log(commdate)
+  `,[name, content, article, iduser, numcom])
   
   res.redirect('/post/'+id)
 })
 
-app.post('/commentaire/:id/delete/:idcom', async (req, res) => {
+app.get('/commentaire/:id/delete/:idcom', async (req, res) => {
   if(!req.session.logged){
     res.redirect(302,'/login')
     return
   }
-  console.log("salut")
+  //console.log("salut")
   const db = await openDb()
   const id = req.params.id
   const iduser = req.session.numuser
@@ -335,19 +339,70 @@ app.post('/commentaire/:id/delete/:idcom', async (req, res) => {
  
   
   const article = id
-  console.log(req.params.id)
+  //console.log("article:"+ id +" utilisateur:"+ iduser + " commentaire:" + numcom)
   const commdate = await db.run(`
     DELETE FROM commentaires
-    WHERE article = ? AND numcom = ?
-  `,[article, numcom])
-  console.log("post commentaire : ")
-  console.log(commdate)
+    WHERE article = ? AND numcom = ? AND iduser = ?
+  `,[article, numcom, iduser])
+  //console.log("post commentaire : ")
+  //console.log(commdate)
   
   res.redirect('/post/'+id)
 })
-/*app.get('/commentaire/edit', async (req, res) => {
-  
-*/
+
+app.get('/commentaire/:id/edit/:idcom', async (req, res) => {
+  const id = req.params.id
+  const iduser = req.session.numuser
+  const idcom = req.params.idcom
+  const db = await openDb()
+  const commentaire= await db.get(`
+    SELECT iduser, name, content FROM commentaires
+    WHERE article = ? AND numcom = ?
+  `,[id, idcom])
+  console.log("utilisateur: "+ iduser +" auteur du commentaire:"+commentaire.iduser)
+  if (
+    iduser == commentaire.iduser
+  ){
+    data={
+      name: commentaire.name,
+      content: commentaire.content,
+      id: id,
+      idcom: idcom,
+    }
+    res.render('commentaire-edit',data)
+  }
+  else {
+    console.log("Vous n'êtes pas la personne qui a créé ce commentaire")
+    
+    res.redirect('/post/'+id)
+  }
+})
+
+app.post('/commentaire/:id/edit/:idcom', async (req, res) => {
+  if(!req.session.logged){
+    res.redirect(302,'/login')
+    return
+  }
+  const db = await openDb()
+  const id = req.params.id
+  const iduser = req.session.numuser
+  const numcom = req.params.idcom
+  const name= req.body.name
+  const content= req.body.content
+  console.log(req.params)
+  //console.log("name: "+name + " content: "+ content)
+  console.log("numcom: "+numcom + " iduser: "+ iduser+ " article: "+ id)
+  const commdate = await db.run(`
+    UPDATE commentaires
+    SET content= ?, name = ?
+    WHERE article = ? AND numcom = ? AND iduser = ?
+  `,[content, name, id, numcom, iduser])
+
+  res.redirect('/post/'+id)
+})
+
+
+
 app.post('/post/:id/delete', async (req, res) => {
   if(!req.session.logged){
     res.redirect(302,'/login')
@@ -373,8 +428,8 @@ app.get('/post/create', async (req, res) => {
   const categories = await db.all(`
     SELECT * FROM categories
   `)
-  console.log("get catégorie : ")
-  console.log(categories)
+  //console.log("get catégorie : ")
+  //console.log(categories)
   
   res.render("post-create",{categories: categories})
 })
@@ -421,7 +476,10 @@ app.get('/post/:id', async (req, res) => {
     SELECT name,content FROM commentaires 
     WHERE article = ?
   `,[id]) 
- 
+  const commentaire2 = await db.all(`
+    SELECT numcom FROM commentaires 
+    WHERE article = ?
+  `,[id])
   let currentavis = 0
   if (typeof(aviuser) == typeof(unevariablenondéfinie)){
     //console.log("On set a 0")
@@ -434,16 +492,19 @@ app.get('/post/:id', async (req, res) => {
   const commentaire_nb = commentaire.length
   let commentaire_content =Array.from({ length: commentaire_nb }, (_, i) => i)
   let commentaire_name =Array.from({ length: commentaire_nb }, (_, i) => i)
-
+  
+  //console.log(commentaire2)
   for (let k = 0; k < commentaire_nb; k++){
-    console.log(commentaire[k])
+    //console.log(commentaire[k])
+    console.log("numcom: "+ commentaire2[k].numcom)
     commentaire_content[k]= commentaire[k].content
     commentaire_name[k]= commentaire[k].name
   }
 
-  console.log(commentaire_content)
-  console.log(commentaire_name)
-  
+  //console.log(commentaire_content)
+  //console.log(commentaire_name)
+
+
   const array_com = Array.from({ length: commentaire_nb }, (_, i) => i+1)
   //console.log(array_com)
   const data = {
@@ -539,17 +600,17 @@ app.get('/dislike/:id', async (req, res) => {
       WHERE article = ? AND user= ?
     `,[id, numuser])
     
-    console.log("état", typeof(aviuserprecedent))
+    //console.log("état", typeof(aviuserprecedent))
 
     if (typeof(aviuserprecedent) == typeof(unevariablenondéfinie)){// Si on était jamais venue sur la page
-      console.log("On est entré")
+      //console.log("On est entré")
       const création_avis = await db.get(`
         INSERT INTO liketab(user, article, etat)
         VALUES(?, ?, ?)
       `,[ numuser, id, 1])
     }
     else {
-      console.log(aviuserprecedent)
+      //console.log(aviuserprecedent)
       if (aviuserprecedent.etat == 1){ // Si on like un poste qu'on avait disliké
         const avis2s = await db.get(`
           UPDATE avis
@@ -571,7 +632,7 @@ app.get('/dislike/:id', async (req, res) => {
       nbdis =nbdis -2
       }
       if (aviuserprecedent.etat ==0){
-        console.log("on change la valeur")
+        //console.log("on change la valeur")
         const avisuser = await db.get(`
           UPDATE liketab
           SET etat = ?
