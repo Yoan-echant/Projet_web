@@ -8,7 +8,7 @@ block body
                           ul.nav.nav-pills.justify-content-end.bg-danger
                             li.nav-item
                                 a.nav-link(href="/" class=!categoryActive ? "active" : "" class="link-dark" ).bg-green Acceuil
-                             //each cat in categories
+                            //each cat in categories
                                 li.nav-item
                                     a.nav-link(href="/"+ cat.cat_id class=categoryActive && categoryActive.cat_id  === cat.cat_id ? "active" : "")=cat.cat_name
                             if(logged)
@@ -31,8 +31,7 @@ block body
                            
        
    
-                        
-                        
+                          
                                               
         div.row
             div.col
@@ -42,58 +41,60 @@ block body
 
         div.row
             div.col
-                 
-                    
-                     span.badge.rounded-pill.bg-primary=post.cat_name
-                     span.badge.rounded-pill.bg-secondary author
-                     span.badge.rounded-pill.bg-secondary 01/01/01
-                     
-                     p=post.content
-                      div.row
-                            div.p-2
-                                .row 
-                                    div.col-2
-                                        form(action="/commentaire/"+post.id method="GET")
-                                                    input(type="Submit" value="Ajouter un commentaire")
-                                    div.col-2
-                                        form(action="/post/" + post.id + "/edit" method="GET")
-                                                input(type="Submit" value="Editer") 
-                             
-                            div.p-2
-                                div.row
-                                    div.col-2
-                                         p= 'nombre de like : ' + data.like 
-                                         form(action="/like/" +post.id method="POST")
-                                                        input(name= "like" type="image" src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Facebook_Like_button.svg/1200px-Facebook_Like_button.svg.png" style="width:80px; height:60px" value="Like")
-                                    div.col-2
-                                         p= 'nombre de dislike :' + data.dislike
-                                         form(action="/dislike/"+post.id method="GET")
-                                                        input(name= "dislike" type="image" src="https://proofmart.com/wp-content/uploads/2020/09/dislike-thumb-product.png" style="width:80px; height:60px" value="Dislike")
-                              
-                            
-                            form(action="/commentaire/"+post.id method="POST")
+               .card   
+                    .card-header
+                        span.badge.rounded-pill.bg-primary=post.cat_name
+                        span.badge.rounded-pill.bg-secondary author
+                        span.badge.rounded-pill.bg-secondary 01/01/01
+                    .card-body
+                        p=post.content
+                        div.row
                                 div.p-2
-                                p='name :'
-                                input(name="name")
+                                    .row 
+                                        div.col-2
+                                            form(action="/commentaire/"+post.id method="GET")
+                                                        input(type="Submit" value="Ajouter un commentaire")
+                                        div.col-2
+                                            form(action="/post/" + post.id + "/edit" method="GET")
+                                                    input(type="Submit" value="Editer") 
+                                
                                 div.p-2
-                                p='content :'
-                                input(name="content")
-                                div.p-2
-                                input(type="submit" value="Ajoutez commentaire")
-                            
-                          .p-4  
-                            h2 Les commentaires :  
-                            each idcom in array_com
-                                .p-2  
-                                    p='objet : '  + commentaire_name[idcom-1]
-                                .p-2      
-                                    p=commentaire_content[idcom-1]                        
-                                    div.col-2
-                                        form(action="/commentaire/" + post.id + "/delete/" + idcom method="GET")
-                                                    input(type="Submit" value="Supprimer le commentaire")
-                                        form(action="/commentaire/" + post.id + "/edit/" + idcom method="GET")
-                                                    input(type="Submit" value="editer le commentaire")
-   
-                           
-                
-                         
+                                    div.row
+                                        div.col-2
+                                            p= 'nombre de like : ' + data.like 
+                                            form(action="/like/" +post.id method="POST")
+                                                            input(name= "like" type="image" src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Facebook_Like_button.svg/1200px-Facebook_Like_button.svg.png" style="width:80px; height:60px" value="Like")
+                                        div.col-2
+                                            p= 'nombre de dislike :' + data.dislike
+                                            form(action="/dislike/"+post.id method="GET")
+                                                            input(name= "dislike" type="image" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAATMAAACkCAMAAADMkjkjAAAAkFBMVEX39/f4AAD7AAD3+/v3///5h4f7Ojr4xsbxzc33/Pz3w8P4wcH38fH31tb35eX3vLz339/32Nj37e34ZWX4Hx/3q6v3ysr3m5v4S0v4QED4a2v4Rkb3i4v3o6P4NDT3r6/3k5P4FRX4cnLfrKz4Kyv3trb4VVX6Kir4cXH5np75hIT4eXnuurrdqqrZoqL4ISGqhAkoAAAExklEQVR4nO2d6XbaMBBG7UiQGIxtIJid4LTQLF3e/+2KIWmb4jEIy/aH892fOeEcuEejbaSR4xBCCCGEEEIIIYRcihKo+3sBsbPh6Tccx/f9XqfTzSDyd//22c0pL5XgB3E8Wixak+l06uaTzFthoL26v/f5SBFzSRylLcsZ9Dbr2fz+hKcjpqOBruYXF0V50Z0BkWhtryuIx9uvprL+snCuIUJVMLwxYhodh1DabakgXg5Xl+s6sIrwm5qKzIylxP9I2/fyqv+wHha19c4DvDT1zdyZ6799dqcrul2+/rKl68CThx2f3sZc2c3N86GhhethYlfXgbkPLU2/XOJsnoaP6pbha88KWppuXeKsvXfWKc2ZO0Hu00CduQtgaajO3Ag3OmGdveI2NFhniV+3GhFYZ24fNjhxncV0ZgzbmTmDutWIwDpL6MwcOjOHY4A5M9hJLa4zN0bNqAA7S1A3hICduVPQhobszB1idmnQztwnSGnYztxHRGngziC30dCduRu8gQDemVu3oWPwnT3ANTR8Z2M6o7MK6MKtoPCd4eWf4J0BTtCKOPtehbMeXGjCO0M87ILuDHAZAO8MbwSAd7YFDE10Z43bC6IzSGcrOjNnAygN3ZnbxZMG7wwwNYzvDO808hU4m6A1tCtw5oZgDe0anM3BhoFrcOYOsBpaEWdfqnIGdnyvkLObipzd0pkxAZ2ZMm3QGFCVsxBsgnYFzuAOI+M7m9St6Ah4Z/d4ZYTgnaF1Zs4VOKtbUAbwztAGAKeYsx9VOAO8xgnvbI3X0IrUcanEmYt3g+eyekHLdDBTPytxBniYylmZK3ur4zDoR5tFgfpwZ4KXRLmk/tnd269Ia5+p0LgEoSFf6xWUhRdszYxNPtbZ87yXkqUBDgNKB53bs+n09f+dsh6VLA1sb3tP0bqhelOusxFcj2YBvS7V2QtecFpAW6uAmUWrkc4cx3IdzA/cAfZnFlC98pTdN1NZqYPnuKGhma5cy3IGlqqziTcpR1kzR80DSn0rxRniFQFrqCApQRnePWGreJF9ZXDZTdt4t7aVtev+SeWjLdfgxi68bQk9tqms/RmU7aQt7Clr4eXQy0Fv7QhLJv2md/9/UE67oKykvV0s+z74axVWUcEJKS+j3p54OU5ZLkebMAy7d4e/RrvhV+vPJCzlxOCZ7IQc8P7Ad9j0a54z0Op5tZO38mzk7n5xVJzjDLBiBgT6UXaGWxS6XtSAzozJWQ7A3ceEwRedNXd7vyiemFNJ6ExCi+mBLicbAvISqs2GJiFvpXFWKyM9+prU/cVw8cS1OuApPBS8uSQN8RQeBvKyE/mpyJrxxGesG50cL4Q8seXQKSKuoNDumAMhnxlt8AGpgqhQctbwoyuFkJxx5BTRM8EZMykiSrpuQWc5JHRmirTJTWcyqk9nxqhppjPMZ9VAEILzmfMzGWFzA62wJRiZzngCIY/sDo2hmUfmUoD7GrlkXh7jcjOXzI1Hdme5qIz0E1ppYzSy3hvDe4QOi4xr15DP6UBxnBTgxvYpjpwB1miE4z9lz4zMk+iP9b54zvEM9IdseofKzuDfE4/DAfuyc1CD9xXnsHdUCIxko/RmOJu9hj6NGaD0DgojhBBCCCGEEELInt8di3KLjYbIQwAAAABJRU5ErkJggg==" style="width:80px; height:60px" value="Dislike")
+                                
+                    .card-footer
+                            .p-4
+                                h4.text-secondary Ecrire un commentaire : 
+                                form(action="/commentaire/"+post.id method="POST")
+                                    div.p-2
+                                    h6.text-secondary Motif
+                                    input(name="name")
+                                    div.p-2
+                                    h6.text-secondary Contenu 
+                                    input(name="content" class="form-control input-lg")
+                                    div.p-2
+                                    input(type="submit" value="Ajoutez commentaire")
+                                
+                            .p-4  
+                                h4.font-weight-bold.text-secondary.font-weight-bold Les commentaires :  
+                                each idcom in array_com
+                                    .card.bg-dark.text-white
+                                        .card-header
+                                            .p-2  
+                                                p='objet : '  + commentaire_name[idcom-1]
+                                        .card-body
+                                            .p-2      
+                                                p=commentaire_content[idcom-1]                        
+                                                div.col-2
+                                                    form(action="/commentaire/" + post.id + "/delete/" + idcom method="GET")
+                                                        input(type="Submit" value="Supprimer le commentaire")
+                                                    form(action="/commentaire/" + post.id + "/edit/" + idcom method="GET")
+                                                        input(type="Submit" value="editer le commentaire")
+                                    .p-2           

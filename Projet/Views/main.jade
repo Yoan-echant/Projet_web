@@ -1,0 +1,14 @@
+doctype html
+html(lang="en")
+  head
+    title= "Mon site"
+    body
+        ul 
+            each id in names
+                li=  "Bonjour " + id.name + " !"
+                
+            form(action="/add" method="POST")
+                input(name="nameadded")
+                input(type="submit" value="Add")
+
+

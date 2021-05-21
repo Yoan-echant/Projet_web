@@ -207,6 +207,7 @@ app.get('/tendance', async(req,res) =>{
     INNER JOIN avis on avis.id = posts.id
     ORDER BY like DESC
   `)
+  
  
   //console.log(posts)
   res.render("tendance",{posts: posts,categories: categories, logged: req.session.logged, numuser: req.session.numuser})
