@@ -78,7 +78,7 @@ async function createCommentaire(db){
 }
 
 async function createAvis(db){
-  const insertRequest = await db.prepare("INSERT INTO avis(dislike, like) VALUES(?, ?)")
+  const insertRequest = await db.prepare("INSERT INTO avis(dislike, like, article) VALUES(?, ?, ?)")
   const avis = [{
     dislike: 1,
     like: 3,
@@ -92,7 +92,7 @@ async function createAvis(db){
   }
   ]
   return await Promise.all( avis.map(av => {
-    return insertRequest.run([av.dislike, av.like])
+    return insertRequest.run([av.dislike, av.like, av.article])
   }))
 }
 

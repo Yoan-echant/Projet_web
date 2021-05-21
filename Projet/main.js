@@ -463,10 +463,23 @@ app.get('/post/:id', async (req, res) => {
     LEFT JOIN categories on categories.cat_id = posts.category
     WHERE id = ?
   `,[id])
-  const aviss = await db.get(`
+  let aviss = await db.get(`
     SELECT like,dislike  FROM avis
-    WHERE id = ?
+    WHERE article = ?
   `,[id])
+
+  if (
+    typeof(aviss)==typeof(unevariablenondéfinie)
+    ){
+      const newavis= await db.run(`
+        INSERT INTO avis(like, dislike, article)
+        VALUES(?, ?, ?)
+      `,[0, 0, id])
+      aviss = await db.get(`
+      SELECT like,dislike  FROM avis
+      WHERE article = ?
+    `,[id])
+  }
   const aviuser = await db.get(`
     SELECT etat  FROM liketab
     WHERE user = ? AND article = ?
