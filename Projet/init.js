@@ -26,7 +26,7 @@ async function createUserdata(db){
     }
   ]
   return await Promise.all(data.map(users => {
-    return insertRequest.run([users.username, users.password])
+    return insertRequest.run([users.username, users.password, users.mail])
   }))
 }
 

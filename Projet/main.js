@@ -270,6 +270,74 @@ app.get('/lecture', async (req, res) => {
   console.log(commentaires)
   
 })
+
+
+
+app.get('/profile', async (req, res) => {
+  if (!req.session.logged){
+    res.redirect('/login')
+  }
+  else{
+    const db = await openDb()
+    iduser= req.session.numuser
+    user = await db.get(`
+        SELECT * FROM userdata
+        WHERE id = ?
+    `, [iduser])
+    data={
+      username: user.username,
+      password: user.password,
+      mail: user.mail,
+      logged: req.session.logged
+    }
+    console.log(data)
+    res.render('profile', data)
+  }
+})
+
+app.post('/changemdp', async (req, res) => {
+  const db = await openDb()
+  iduser= req.session.numuser
+  current_mdp=req.body.current_password
+  mdp= req.body.password
+  mdp_ver=req.body.password_ver
+  password = await db.get(`
+      SELECT password FROM userdata
+      WHERE id = ?
+  `, [iduser])
+  let test = 0
+  if (password.password != current_mdp){
+    test =1
+    data={
+      errors: "Mauvais mot de passe"
+    }
+  }
+  else if (mdp != mdp_ver){
+    test =1
+    data={
+      errors: "Les nouveaux mdp ne sont pas identique"
+    }
+  }
+  else if (mdp.length < 6){
+    test =1
+    data={
+      errors: "Le mot de passe doit faire au moins 6 charactère"
+    }
+  }
+  if (test == 0){
+    changepassword = await db.run(`
+    UPDATE userdata
+    SET password = ?
+    WHERE id = ?
+  `, [mdp, iduser])
+  res.redirect("/profile")
+  }
+  else{
+    res.redirect("/profile",data)
+  }
+})
+
+
 app.get('/commentaires2', async (req, res) => {
   res.render("commentaires")
 })
@@ -448,7 +516,7 @@ app.post('/post/create', async (req, res) => {
   const content = req.body.content
   const category = req.body.category
   const post = await db.run(`
-    INSERT INTO posts(name,content,category, auteur)
+    INSERT INTO posts(name, content, category, auteur)
     VALUES(?, ?, ?, ?)
   `,[name, content, category, iduser])
   console.log("post create post : ")
@@ -802,3 +870,4 @@ app.get('/:cat?', async (req, res) => {
 app.listen(port,  () => {
   console.log(`Example app listening at http://localhost:${port}`)
 })
+
