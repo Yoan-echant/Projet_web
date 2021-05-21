@@ -1,8 +1,11 @@
 extends layout
+
+
+
 block body
      div.container-fluid.bg-secondary
         div.row
-            div.col
+            div.col-xxl
                 div.header.bg-danger
                     nav.d-flex.justify-content-center.align-items-center
                           ul.nav.nav-pills.justify-content-end.bg-danger
@@ -13,10 +16,10 @@ block body
                                     a.nav-link(href="/"+ cat.cat_id class=categoryActive && categoryActive.cat_id  === cat.cat_id ? "active" : "" class="link-dark")=cat.cat_name
                             if(logged)
                                 li.nav-item
-                                    a.nav-link(href="/tendance") Tendance
+                                    a.nav-link(href="/tendance" class="link-dark") Tendance
                             if(logged)
                                 li.nav-item
-                                    a.nav-link(href="/categories") Editer categories
+                                    a.nav-link(href="/categories" class="link-dark") Editer categories
                             if (logged)
                                 li.nav-item
                                     a.nav-link(href="/post/create" class="link-dark").bg-green Créer un nouveau post 
@@ -40,29 +43,50 @@ block body
                     div.container
                         h1.text-center=categoryActive ? categoryActive.cat_name : "Acceuil"
         
-
-        div.row.mt-6
-            div.col.center-block
-                each postToRow, index in posts
-                  if index % 3 === 0
-                    div.row
-                    div.bg-light.p-2
-                        each indexToSearch in [index, index + 1, index + 2]
-                            if posts[indexToSearch]
-                                div.col-3
-                                    div.panel.panel-default
-                                    a(href="/post/" + posts[indexToSearch].id  class="link-dark")
-                                       
+        
+        div.row.mt
+            div.col
+                .bg-light
+                
+                    each postToRow, index in posts
+                        if index % 3 === 0
+                            div.row
+                                
+                                    each indexToSearch in [index, index + 1, index + 2]
+                                        if posts[indexToSearch]
                                         
-                                        h4=posts[indexToSearch].name
-                                        if !categoryActive
-                                            span.badge.rounded-pill.bg-primary=posts[indexToSearch].cat_name
-                                        span.badge.rounded-pill.bg-secondary author
-                                        span.badge.rounded-pill.bg-secondary 01/01/01
-                                        div.panel-content    
-                                            p=posts[indexToSearch].content
-                if posts.length <= 0
-                  div.col
+                                            div.col.text-center
+                                                div.p-2
+                                                
+                                                    .card
+                                                        
+                                                        
+                                                            .card-header 
+                                                                h4=posts[indexToSearch].name
+                                                        
+                                                                if !categoryActive
+                                                                    span.badge.rounded-pill.bg-primary=posts[indexToSearch].cat_name
+                                                                span.badge.rounded-pill.bg-secondary author
+                                                                span.badge.rounded-pill.bg-secondary 01/01/01
+                                                            
+                                                            p=posts[indexToSearch].content
+                                                            
+                                                            form(action="/post/" + posts[indexToSearch].id )
+                                                                input(type="submit" value="Découvrir")
+                                                            p=posts[indexToSearch].lien
+                                                            
+                                                            div.p-2
+                                                        
+                        if posts.length <= 0
+                            div.col
 
-         div.row 
-            
+         div.row
+            div.col
+                div.bg-light.p-6
+                    a(href=posts[1].lien )
+         
+        
+
+
+    
+

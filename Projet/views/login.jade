@@ -49,8 +49,18 @@ block body
                                 form(method="POST" action="/login")
                                     input(type="submit" value="Login")
                     else
-                         form(method="POST" action="/login")
-                            input(type="submit" value="Logout")
-                        form(method="POST" action='/blog')
-                            input(type="submit" value="Retour accueil")
+                        .row 
+                            .col
+                                div.p-2.alert.alert-success
+                                     h3="la connexion a été effectué avec succés "
+                                        img(class="rounded img-fluid" src="https://snpl.com/wp-content/uploads/2019/12/icone-valider-png-2-300x200.png"  style="width:40px; height:40px" )
+                                
+                        div.p-2
+                            .row 
+                                .col-1
+                                    form(method="POST" action="/login")
+                                        input(type="submit" value="Logout")
+                                .col-1      
+                                    form(method="POST" action='/blog')
+                                        input(type="submit" value="Retour accueil")
 

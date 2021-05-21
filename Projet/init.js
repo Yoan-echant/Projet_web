@@ -33,14 +33,28 @@ async function createUserdata(db){
 async function createPosts(db){
   const insertRequest = await db.prepare("INSERT INTO posts(name, content, category) VALUES(?, ?, ?)")
   const contents = [{
-    name: "Article 1",
-    content: "Lorem lipsum, Lorem lipsum Lorem lipsum Lorem lipsum",
+    name: "Telecom",
+    content: "Lien :  Les télécommunications sont définies comme la transmission d’informations à distance en utilisant des technologies électronique, informatique, de transmission filaire, optique ou électromagnétique. Ce terme a un sens plus large que son acception équivalente officielle « communication électronique ». Elles se distinguent ainsi de la poste qui transmet des informations ou des objets sous forme physique. ",
     category: 1,
+    lien: "https://fr.wikipedia.org/wiki/T%C3%A9l%C3%A9communications"
+  },
+  {
+    name: "Communication numérique",
+    content: "  Les télécommunications sont définies comme la transmission d’informations à distance en utilisant des technologies électronique, informatique, de transmission filaire, optique ou électromagnétique. Ce terme a un sens plus large que son acception équivalente officielle « communication électronique ». Elles se distinguent ainsi de la poste qui transmet des informations ou des objets sous forme physique. ",
+    category: 1,
+    lien: "https://fr.wikipedia.org/wiki/T%C3%A9l%C3%A9communications"
+  },
+  {
+    name: "Telecom",
+    content: "Les télécommunications sont définies comme la transmission d’informations à distance en utilisant des technologies électronique, informatique, de transmission filaire, optique ou électromagnétique. Ce terme a un sens plus large que son acception équivalente officielle « communication électronique ». Elles se distinguent ainsi de la poste qui transmet des informations ou des objets sous forme physique. ",
+    category: 2,
+    lien: "https://fr.wikipedia.org/wiki/T%C3%A9l%C3%A9communications"
   },
     {
       name: "Article 2",
       content: "Lorem lipsum, Lorem lipsum Lorem lipsum Lorem lipsum",
       category: 2,
+      lien: "https://fr.wikipedia.org/wiki/T%C3%A9l%C3%A9communications"
     }
   ]
   return await Promise.all(contents.map(post => {
@@ -77,14 +91,24 @@ async function createCommentaire(db){
 async function createAvis(db){
   const insertRequest = await db.prepare("INSERT INTO avis(dislike, like) VALUES(?, ?)")
   const avis = [{
-    dislike: 1,
-    like: 3,
+    dislike: 0,
+    like: 0,
     article: 1
   }, 
   {
-    dislike: 4,
+    dislike: 0,
     like: 0,
     article: 2
+  }, 
+  {
+    dislike: 0,
+    like: 0,
+    article: 3
+  }, 
+  {
+    dislike: 0,
+    like: 0,
+    article: 4
     
   }
   ]
@@ -131,6 +155,7 @@ async function createTables(db){
           name varchar(255),
           category int,
           content text,
+          lien text,
           article int,
           FOREIGN KEY(category) REFERENCES categories(cat_id)
         )

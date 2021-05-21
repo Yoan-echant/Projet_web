@@ -207,9 +207,14 @@ app.get('/tendance', async(req,res) =>{
     INNER JOIN avis on avis.id = posts.id
     ORDER BY like DESC
   `)
+  const aviss = await db.get(`
+      SELECT like,dislike  FROM avis 
+      
+    `)
+  
  
   console.log(posts)
-  res.render("tendance",{posts: posts,categories: categories, logged: req.session.logged, numuser: req.session.numuser})
+  res.render("tendance",{posts: posts,aviss: aviss, categories: categories, logged: req.session.logged, numuser: req.session.numuser})
 })
 
 app.post('/tendance', async(req,res) =>{
