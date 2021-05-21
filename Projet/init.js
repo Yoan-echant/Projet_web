@@ -31,20 +31,22 @@ async function createUserdata(db){
 }
 
 async function createPosts(db){
-  const insertRequest = await db.prepare("INSERT INTO posts(name, content, category) VALUES(?, ?, ?)")
+  const insertRequest = await db.prepare("INSERT INTO posts(name, content, category, auteur) VALUES(?, ?, ?, ?)")
   const contents = [{
     name: "Article 1",
     content: "Lorem lipsum, Lorem lipsum Lorem lipsum Lorem lipsum",
     category: 1,
+    auteur: 2,
   },
     {
       name: "Article 2",
       content: "Lorem lipsum, Lorem lipsum Lorem lipsum Lorem lipsum",
       category: 2,
+      auteur: 2,
     }
   ]
   return await Promise.all(contents.map(post => {
-    return insertRequest.run([post.name, post.content, post.category])
+    return insertRequest.run([post.name, post.content, post.category, post.auteur])
   }))
 }
 
@@ -135,7 +137,9 @@ async function createTables(db){
           category int,
           content text,
           article int,
-          FOREIGN KEY(category) REFERENCES categories(cat_id)
+          auteur int,
+          FOREIGN KEY(category) REFERENCES categories(cat_id),
+          FOREIGN KEY(auteur) REFERENCES users(id)
         )
   `)
   const users = db.run(`

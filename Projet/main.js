@@ -410,11 +410,12 @@ app.post('/post/:id/delete', async (req, res) => {
   }
 
   const db = await openDb()
+  const iduser = req.session.numuser
   const id = req.params.id
   await db.run(`
     DELETE FROM posts
-    WHERE id = ?
-  `,[id])
+    WHERE id = ? AND auteur = ?
+  `,[id, iduser])
   res.redirect("/")
 })
 
@@ -675,6 +676,7 @@ app.get('/post/:id/edit', async (req, res) => {
 
   const db = await openDb()
   const id = req.params.id
+  const iduser = req.session.numuser
   const categories = await db.all(`
     SELECT * FROM categories
   `)
@@ -683,7 +685,12 @@ app.get('/post/:id/edit', async (req, res) => {
     LEFT JOIN categories on categories.cat_id = posts.category
     WHERE id = ?
   `,[id])
-  res.render("post-edit",{post: post, categories: categories})
+  if (post.auteur == iduser){
+    res.render("post-edit",{post: post, categories: categories})
+  }
+  else {
+    res.redirect("/post/"+id)
+  }
 })
 
 app.post('/post/:id/edit', async (req, res) => {
@@ -704,21 +711,6 @@ app.post('/post/:id/edit', async (req, res) => {
     WHERE id = ?
   `,[name, content, category, id])
   res.redirect("/post/" + id)
-})
-
-app.post('/post/:id/delete', async (req, res) => {
-  if(!req.session.logged){
-    res.redirect(302,'/login')
-    return
-  }
-
-  const db = await openDb()
-  const id = req.params.id
-  await db.run(`
-    DELETE FROM posts
-    WHERE id = ?
-  `,[id])
-  res.redirect("/")
 })
 
 app.get('/categories', async (req, res) => {
