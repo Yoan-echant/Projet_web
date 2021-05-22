@@ -89,8 +89,8 @@ block body
                                                         
                                                                 if !categoryActive
                                                                     span.badge.rounded-pill.bg-primary=posts[indexToSearch].cat_name
-                                                                span.badge.rounded-pill.bg-primary author
-                                                                span.badge.rounded-pill.bg-primary 01/01/01
+                                                                span.badge.rounded-pill.bg-primary= posts[indexToSearch].username
+                                                                span.badge.rounded-pill.bg-primary= data.date[indexToSearch]
                                                             
                                                             p=posts[indexToSearch].content
                                                             

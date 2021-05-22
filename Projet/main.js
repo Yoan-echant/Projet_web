@@ -229,20 +229,47 @@ app.post('/signup',async (req, res) => {
 
 
 app.get('/tendance', async(req,res) =>{
-  const db = await openDb()
-  const categories = await db.all(`
-    SELECT * FROM categories
-  `)
-  let posts = []
-  posts = await db.all(`
-    SELECT * FROM posts
-    INNER JOIN avis on avis.id = posts.id
-    ORDER BY like DESC
-  `)
-  
- 
-  //console.log(posts)
-  res.render("tendance",{posts: posts,categories: categories, logged: req.session.logged, numuser: req.session.numuser})
+  if (req.session.logged){
+    const db = await openDb()
+
+    const categories = await db.all(`
+      SELECT * FROM categories
+    `)
+
+    let posts = []
+    posts = await db.all(`
+      SELECT * FROM posts
+      INNER JOIN avis on avis.id = posts.id
+      INNER JOIN userdata ON posts.auteur=userdata.id
+      ORDER BY like DESC
+    `)
+    
+    let cur_date=[]
+
+    if ( typeof(posts) == typeof(unevariablenondéfinie)){
+      posts=[]
+    }
+    else {
+      let date =""
+      let jour = ""
+      let month = ""
+      let year = ""
+      for (let i = 0; i < posts.length; i++){
+        date_comp=new Date(posts[i].date_parution + 3600000).toString()//On met la date au bon crénaux horaire
+        jour= date_comp[8] + date_comp[9]
+        month= date_comp[4]+ date_comp[5]+ date_comp[6]
+        year= date_comp[11] + date_comp[12]+ date_comp[13]+ date_comp[14]
+
+        cur_date[i] = jour+" "+month+" "+year
+      }
+    }
+
+    console.log(posts)
+    res.render("tendance",{posts: posts,categories: categories, logged: req.session.logged, numuser: req.session.numuser, date: cur_date})
+  }
+  else {
+    res.redirect('/login')
+  }
 })
 
 app.post('/tendance', async(req,res) =>{
@@ -266,15 +293,37 @@ app.get('/visite', async(req,res) =>{
     const categories = await db.all(`
       SELECT * FROM categories
     `)
+
     let posts = []
     posts = await db.all(`
       SELECT * FROM posts
       INNER JOIN visite ON visite.article = posts.id
       INNER JOIN postupdate ON postupdate.article = posts.id
+      INNER JOIN userdata ON posts.auteur=userdata.id
       WHERE visite.user= ? AND postupdate.lastupdate > visite.date AND visite.date + 86400000 > ?
     `,[numerouser, Date.now()])
-    console.log(posts)
-    res.render("visite",{posts: posts,categories: categories, logged: req.session.logged, numuser: req.session.numuser})
+
+    let cur_date=[]
+
+    if ( typeof(posts) == typeof(unevariablenondéfinie)){
+      posts=[]
+    }
+    else {
+      let date =""
+      let jour = ""
+      let month = ""
+      let year = ""
+      for (let i = 0; i < posts.length; i++){
+        date_comp=new Date(posts[i].date_parution + 3600000).toString()//On met la date au bon crénaux horaire
+        jour= date_comp[8] + date_comp[9]
+        month= date_comp[4]+ date_comp[5]+ date_comp[6]
+        year= date_comp[11] + date_comp[12]+ date_comp[13]+ date_comp[14]
+
+        cur_date[i] = jour+" "+month+" "+year
+      }
+    }
+    console.log(cur_date)
+    res.render("visite",{posts: posts,categories: categories, logged: req.session.logged, date: cur_date, numuser: req.session.numuser})
   }
 })
 
@@ -333,27 +382,52 @@ app.get('/profile', async (req, res) => {
   else{
     const db = await openDb()
     iduser= req.session.numuser
+
+    const categories = await db.all(`
+    SELECT * FROM categories
+    `)
+
     user = await db.get(`
         SELECT * FROM userdata
         WHERE id = ?
     `, [iduser])
+
     post= await db.all(`
       SELECT * FROM posts
       INNER JOIN visite ON visite.article = posts.id
+      INNER JOIN postupdate ON postupdate.article = posts.id
+      INNER JOIN userdata ON posts.auteur=userdata.id
       WHERE visite.user= ?
       ORDER BY visite.date DESC
     `,[iduser])
+
+    let cur_date=[]
+
     if ( typeof(post) == typeof(unevariablenondéfinie)){
       post=[]
+    }
+    else {
+      let date =""
+      let jour = ""
+      let month = ""
+      let year = ""
+      for (let i = 0; i < post.length; i++){
+        date_comp=new Date(post[i].date_parution + 3600000).toString()//On met la date au bon crénaux horaire
+        jour= date_comp[8] + date_comp[9]
+        month= date_comp[4]+ date_comp[5]+ date_comp[6]
+        year= date_comp[11] + date_comp[12]+ date_comp[13]+ date_comp[14]
+
+        cur_date[i] = jour+" "+month+" "+year
+      }
     }
     data={
       username: user.username,
       mail: user.mail,
       logged: req.session.logged,
-      posts: post
+      posts: post,
+      date: cur_date
     }
-    console.log(data)
-    res.render('profile', data)
+    res.render('profile', {data, categories: categories})
   }
 })
 
