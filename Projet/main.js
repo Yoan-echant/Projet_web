@@ -511,30 +511,35 @@ app.get('/commentaire/:id/delete/:idcom', async (req, res) => {
 })
 
 app.get('/commentaire/:id/edit/:idcom', async (req, res) => {
-  const id = req.params.id
-  const iduser = req.session.numuser
-  const idcom = req.params.idcom
-  const db = await openDb()
-  const commentaire= await db.get(`
-    SELECT iduser, name, content FROM commentaires
-    WHERE article = ? AND numcom = ?
-  `,[id, idcom])
-  console.log("utilisateur: "+ iduser +" auteur du commentaire:"+commentaire.iduser)
-  if (
-    iduser == commentaire.iduser
-  ){
-    data={
-      name: commentaire.name,
-      content: commentaire.content,
-      id: id,
-      idcom: idcom,
+  if (req.params.logged){
+    const id = req.params.id
+    const iduser = req.session.numuser
+    const idcom = req.params.idcom
+    const db = await openDb()
+    const commentaire= await db.get(`
+      SELECT iduser, name, content FROM commentaires
+      WHERE article = ? AND numcom = ?
+    `,[id, idcom])
+    console.log("utilisateur: "+ iduser +" auteur du commentaire:"+commentaire.iduser)
+    if (
+      iduser == commentaire.iduser
+    ){
+      data={
+        name: commentaire.name,
+        content: commentaire.content,
+        id: id,
+        idcom: idcom,
+      }
+      res.render('commentaire-edit',data)
     }
-    res.render('commentaire-edit',data)
+    else {
+      console.log("Vous n'êtes pas la personne qui a créé ce commentaire")
+      
+      res.redirect('/post/'+id)
+    }
   }
   else {
-    console.log("Vous n'êtes pas la personne qui a créé ce commentaire")
-    
-    res.redirect('/post/'+id)
+    res.redirect('/login')
   }
 })
 
@@ -543,22 +548,48 @@ app.post('/commentaire/:id/edit/:idcom', async (req, res) => {
     res.redirect(302,'/login')
     return
   }
-  const db = await openDb()
-  const id = req.params.id
-  const iduser = req.session.numuser
-  const numcom = req.params.idcom
-  const name= req.body.name
-  const content= req.body.content
-  console.log(req.params)
-  //console.log("name: "+name + " content: "+ content)
-  console.log("numcom: "+numcom + " iduser: "+ iduser+ " article: "+ id)
-  const commdate = await db.run(`
-    UPDATE commentaires
-    SET content= ?, name = ?
-    WHERE article = ? AND numcom = ? AND iduser = ?
-  `,[content, name, id, numcom, iduser])
+  else {
+    const db = await openDb()
+    const id = req.params.id
+    const iduser = req.session.numuser
+    const numcom = req.params.idcom
+    const name= req.body.name
+    const content= req.body.content
+    console.log(req.params)
+    //console.log("name: "+name + " content: "+ content)
+    console.log("numcom: "+numcom + " iduser: "+ iduser+ " article: "+ id)
+    const commdate = await db.run(`
+      UPDATE commentaires
+      SET content= ?, name = ?
+      WHERE article = ? AND numcom = ? AND iduser = ?
+    `,[content, name, id, numcom, iduser])
 
-  res.redirect('/post/'+id)
+    const exist_date_post = await db.get(`
+      SELECT * FROM postupdate
+      WHERE article = ?
+    `,[id])
+
+    if (typeof(exist_date_post) == typeof(unevariablenondéfinie)){
+      console.log("cas non definie article")
+      console.log(" id "+ id + " time: "+ Date.now())
+      const add_update_post = await db.run(`
+        INSERT INTO postupdate(article, date)
+        VALUES(?, ?)
+      `,[id, Date.now()])
+    }
+
+    else {
+      console.log("Cas definie article:"+id+" date "+ Date.now())
+      const update_date_post = await db.run(`
+        UPDATE postupdate
+        SET lastupdate = ?
+        WHERE article = ?
+      `,[Date.now(), id])
+    }
+
+
+    res.redirect('/post/'+id)
+  }
 })
 
 
@@ -608,9 +639,9 @@ app.post('/post/create', async (req, res) => {
   const content = req.body.content
   const category = req.body.category
   const post = await db.run(`
-    INSERT INTO posts(name, content, category, auteur)
-    VALUES(?, ?, ?, ?)
-  `,[name, content, category, iduser])
+    INSERT INTO posts(name, content, category, auteur, date_parution)
+    VALUES(?, ?, ?, ?, ?)
+  `,[name, content, category, iduser, Date.now()])
   console.log("post create post : ")
   console.log(post)
   res.redirect("/post/" + post.lastID)
@@ -683,15 +714,18 @@ app.get('/post/:id', async (req, res) => {
       SELECT name,content FROM commentaires 
       WHERE article = ?
     `,[id]) 
+
     const commentaire2 = await db.all(`
       SELECT numcom FROM commentaires 
       WHERE article = ?
     `,[id])
     console.log(post.auteur)
+
     const auteur= await db.get(`
       SELECT username FROM userdata
       WHERE id = ?
     `,[post.auteur])
+
 
     let currentavis = 0
     if (typeof(aviuser) == typeof(unevariablenondéfinie)){
@@ -720,11 +754,25 @@ app.get('/post/:id', async (req, res) => {
 
     const array_com = Array.from({ length: commentaire_nb }, (_, i) => i+1)
     //console.log(array_com)
+    
+    const datepost= await db.get(`
+      SELECT date_parution FROM posts
+      WHERE id = ?
+    `,[id])
+    
+    const date_comp=new Date(datepost.date_parution + 3600000).toString()//On met la date au bon crénaux horaire
+    const jour= date_comp[8] + date_comp[9]
+    const month= date_comp[4]+ date_comp[5]+ date_comp[6]
+    const year= date_comp[11] + date_comp[12]+ date_comp[13]+ date_comp[14]
+
+    let cur_date = jour+" "+month+" "+year
+
     const data = {
       like:aviss.like,
       dislike:aviss.dislike,
       useropinion: currentavis,
-      user: req.session.userdata
+      user: auteur.username,
+      date: cur_date
     }
 
     res.render("post",{post: post, numuser: numuser, logged: req.session.logged, data, commentaire_name, commentaire_content, commentaire_nb, array_com})
@@ -874,25 +922,28 @@ app.get('/post/:id/edit', async (req, res) => {
     res.redirect(302,'/login')
     return
   }
-
-  const db = await openDb()
-  const id = req.params.id
-  const iduser = req.session.numuser
-  const categories = await db.all(`
-    SELECT * FROM categories
-  `)
-  const post = await db.get(`
-    SELECT * FROM posts
-    LEFT JOIN categories on categories.cat_id = posts.category
-    WHERE id = ?
-  `,[id])
-  console.log("requete de : "+ iduser)
-  console.log(post)
-  if (post.auteur == iduser){
-    res.render("post-edit",{post: post, categories: categories})
-  }
   else {
-    res.redirect("/post/"+id)
+    const db = await openDb()
+    const id = req.params.id
+    const iduser = req.session.numuser
+    const categories = await db.all(`
+      SELECT * FROM categories
+    `)
+    const post = await db.get(`
+      SELECT * FROM posts
+      LEFT JOIN categories on categories.cat_id = posts.category
+      WHERE id = ?
+    `,[id])
+
+    console.log("requete de : "+ iduser)
+    console.log(post)
+
+    if (post.auteur == iduser){
+      res.render("post-edit",{post: post, categories: categories})
+    }
+    else {
+      res.redirect("/post/"+id)
+    }
   }
 })
 
@@ -901,19 +952,51 @@ app.post('/post/:id/edit', async (req, res) => {
     res.redirect(302,'/login')
     return
   }
+  else {
+    const db = await openDb()
+    const id = req.params.id
+    const name = req.body.name
+    const content = req.body.content
+    const category = req.body.category
 
-  const db = await openDb()
-  const id = req.params.id
-  const name = req.body.name
-  const content = req.body.content
-  const category = req.body.category
+    const post_update=await db.run(`
+      UPDATE posts
+      SET name = ?, content = ?, category = ?
+      WHERE id = ?
+    `,[name, content, category, id])
 
-  await db.run(`
-    UPDATE posts
-    SET name = ?, content = ?, category = ?
-    WHERE id = ?
-  `,[name, content, category, id])
-  res.redirect("/post/" + id)
+    const date_update = await db.run(`
+      UPDATE posts
+      SET date_parution = ?
+      WHERE id = ?
+    `,[Date.now(), id])
+
+    const exist_date_post = await db.get(`
+    SELECT * FROM postupdate
+    WHERE article = ?
+  `,[id])
+
+  if (typeof(exist_date_post) == typeof(unevariablenondéfinie)){
+    console.log("cas non definie article")
+    console.log(" id "+ id + " time: "+ Date.now())
+    const add_update_post = await db.run(`
+      INSERT INTO postupdate(article, date)
+      VALUES(?, ?)
+    `,[id, Date.now()])
+  }
+
+  else {
+    console.log("Cas definie article:"+id+" date "+ Date.now())
+    const update_date_post = await db.run(`
+      UPDATE postupdate
+      SET lastupdate = ?
+      WHERE article = ?
+    `,[Date.now(), id])
+  }
+
+
+    res.redirect("/post/" + id)
+  }
 })
 
 app.get('/categories', async (req, res) => {

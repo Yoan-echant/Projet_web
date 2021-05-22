@@ -31,20 +31,22 @@ async function createUserdata(db){
 }
 
 async function createPosts(db){
-  const insertRequest = await db.prepare("INSERT INTO posts(name, content, category, lien, auteur) VALUES(?, ?, ?, ?, ?)")
+  const insertRequest = await db.prepare("INSERT INTO posts(name, content, category, lien, auteur, date_parution) VALUES(?, ?, ?, ?, ?, ?)")
   const contents = [{
     name: "Telecommunication",
     content: "Lien :  Les télécommunications sont définies comme la transmission d’informations à distance en utilisant des technologies électronique, informatique, de transmission filaire, optique ou électromagnétique. Ce terme a un sens plus large que son acception équivalente officielle « communication électronique ». Elles se distinguent ainsi de la poste qui transmet des informations ou des objets sous forme physique. ",
     category: 1,
     lien: "https://fr.wikipedia.org/wiki/T%C3%A9l%C3%A9communications",
-    auteur: 2
+    auteur: 2,
+    date_parution: Date.now()
   },
   {
     name: "Communication numérique",
     content: " La communication numérique, parfois appelée « communication digitale » (anglicisme), est un champ des sciences de l’information relatif à l'utilisation de l’ensemble des médias numériques : le web, les médias sociaux ou les terminaux mobiles par exemple. Ces médias sont utilisés comme des canaux de diffusion, de partage et de création d'informations1. ",
     category: 1,
     lien: "https://fr.wikipedia.org/wiki/Communication_num%C3%A9rique",
-    auteur: 2
+    auteur: 2,
+    date_parution: Date.now()
   },
   {
     name: "Programmation Web",
@@ -52,6 +54,7 @@ async function createPosts(db){
     category: 2,
     lien: "https://fr.wikipedia.org/wiki/Programmation_web",
     auteur: 2,
+    date_parution: Date.now()
   },
     {
       name: "TCP/IP ",
@@ -59,10 +62,11 @@ async function createPosts(db){
       category: 2,
       lien: "https://fr.wikipedia.org/wiki/Suite_des_protocoles_Internet",
       auteur: 2,
+      date_parution: Date.now()
     }
   ]
   return await Promise.all(contents.map(post => {
-    return insertRequest.run([post.name, post.content, post.category, post.lien, post.auteur])
+    return insertRequest.run([post.name, post.content, post.category, post.lien, post.auteur, post.date_parution])
   }))
 }
 
@@ -208,6 +212,7 @@ async function createTables(db){
           lien text,
           article int,
           auteur int,
+          date_parution int,
           FOREIGN KEY(category) REFERENCES categories(cat_id),
           FOREIGN KEY(auteur) REFERENCES userdata(id)
         )
