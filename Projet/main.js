@@ -287,7 +287,6 @@ app.get('/profile', async (req, res) => {
     `, [iduser])
     data={
       username: user.username,
-      password: user.password,
       mail: user.mail,
       logged: req.session.logged
     }
