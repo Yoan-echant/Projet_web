@@ -382,6 +382,7 @@ app.get('/profile', async (req, res) => {
         WHERE id = ?
     `, [iduser])
 
+    let post =[]
     post= await db.all(`
       SELECT * FROM posts
       INNER JOIN visite ON visite.article = posts.id
@@ -414,10 +415,10 @@ app.get('/profile', async (req, res) => {
       username: user.username,
       mail: user.mail,
       logged: req.session.logged,
-      posts: post,
       date: cur_date
     }
-    res.render('profile', {data, categories: categories})
+    console.log(post)
+    res.render('profile', {data, categories: categories, posts: post})
   }
 })
 
