@@ -8,7 +8,7 @@ block body
                           ul.nav.nav-pills.justify-content-end.bg-danger
                             li.nav-item
                                 a.nav-link(href="/" class=!categoryActive ? "active" : "" class="link-dark") Acceuil
-                             each cat in categories
+                             //each cat in categories
                                 li.nav-item
                                     a.nav-link(href="/"+ cat.cat_id class=categoryActive && categoryActive.cat_id  === cat.cat_id ? "active" : "" class="link-dark")=cat.cat_name
                             if(logged)
@@ -30,6 +30,12 @@ block body
                             if(!logged)
                                 li.nav-item
                                     a.nav-link(href="/signup" class="link-dark") Créer un compte 
+                            if(logged)
+                                li.nav-item
+                                    a.nav-link(href="/profile" class="link-dark") Profil
+                            if(logged)
+                                li.nav-item
+                                    a.nav-link(href="/visite" class="link-dark") Visite 
                             img(src='https://upload.wikimedia.org/wikipedia/fr/thumb/5/58/Reddit_logo_new.svg/1200px-Reddit_logo_new.svg.png' style="width:80px; height:40px" )
                            
        

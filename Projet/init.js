@@ -6,7 +6,7 @@ const tablesNames = ["categories","posts","userdata", "commentaires", "avis", "v
 
 async function createCategories(db){
   const insertRequest = await db.prepare("INSERT INTO categories(cat_name) VALUES(?)")
-  const names = ["Categorie 1", "Categorie 2"]
+  const names = ["Signaux", "Informatique et Réseaux"]
   return await Promise.all(names.map(cat => {
     return insertRequest.run(cat)
   }))
@@ -31,9 +31,9 @@ async function createUserdata(db){
 }
 
 async function createPosts(db){
-  const insertRequest = await db.prepare("INSERT INTO posts(name, content, category, auteur) VALUES(?, ?, ?, ?)")
+  const insertRequest = await db.prepare("INSERT INTO posts(name, content, category, lien, auteur) VALUES(?, ?, ?, ?, ?)")
   const contents = [{
-    name: "Telecom",
+    name: "Telecommunication",
     content: "Lien :  Les télécommunications sont définies comme la transmission d’informations à distance en utilisant des technologies électronique, informatique, de transmission filaire, optique ou électromagnétique. Ce terme a un sens plus large que son acception équivalente officielle « communication électronique ». Elles se distinguent ainsi de la poste qui transmet des informations ou des objets sous forme physique. ",
     category: 1,
     lien: "https://fr.wikipedia.org/wiki/T%C3%A9l%C3%A9communications",
@@ -41,53 +41,67 @@ async function createPosts(db){
   },
   {
     name: "Communication numérique",
-    content: "  Les télécommunications sont définies comme la transmission d’informations à distance en utilisant des technologies électronique, informatique, de transmission filaire, optique ou électromagnétique. Ce terme a un sens plus large que son acception équivalente officielle « communication électronique ». Elles se distinguent ainsi de la poste qui transmet des informations ou des objets sous forme physique. ",
+    content: " La communication numérique, parfois appelée « communication digitale » (anglicisme), est un champ des sciences de l’information relatif à l'utilisation de l’ensemble des médias numériques : le web, les médias sociaux ou les terminaux mobiles par exemple. Ces médias sont utilisés comme des canaux de diffusion, de partage et de création d'informations1. ",
     category: 1,
-    lien: "https://fr.wikipedia.org/wiki/T%C3%A9l%C3%A9communications",
+    lien: "https://fr.wikipedia.org/wiki/Communication_num%C3%A9rique",
     auteur: 2
   },
   {
-    name: "Telecom",
-    content: "Les télécommunications sont définies comme la transmission d’informations à distance en utilisant des technologies électronique, informatique, de transmission filaire, optique ou électromagnétique. Ce terme a un sens plus large que son acception équivalente officielle « communication électronique ». Elles se distinguent ainsi de la poste qui transmet des informations ou des objets sous forme physique. ",
+    name: "Programmation Web",
+    content: "La programmation web est la programmation informatique qui permet d'éditer des sites web. Elle permet la création d'applications, destinées à être déployées sur Internet ou en Intranet. Ces applications web sont constituées de pages web pouvant prendre différentes formes, telles que  :  ",
     category: 2,
-    lien: "https://fr.wikipedia.org/wiki/T%C3%A9l%C3%A9communications",
+    lien: "https://fr.wikipedia.org/wiki/Programmation_web",
     auteur: 2,
   },
     {
-      name: "Article 2",
-      content: "Lorem lipsum, Lorem lipsum Lorem lipsum Lorem lipsum",
+      name: "TCP/IP ",
+      content: "TCP/IP fut créé lorsque Bob Kahn, travaillant alors pour la DARPA, dut créer un protocole pour un réseau de commutation de paquets par radio. Bien qu'ayant été un ingénieur majeur de l'ARPANET, qui utilisait alors le protocole NCP, il ne put se résoudre à l'utiliser car celui-ci devait fonctionner avec l'équipement réseau IMP et en plus n'effectuait pas de contrôle des erreurs. Il créa donc avec Vinton Cerf un protocole permettant de relier les réseaux entre eux3. ",
       category: 2,
-      lien: "https://fr.wikipedia.org/wiki/T%C3%A9l%C3%A9communications",
+      lien: "https://fr.wikipedia.org/wiki/Suite_des_protocoles_Internet",
       auteur: 2,
     }
   ]
   return await Promise.all(contents.map(post => {
-    return insertRequest.run([post.name, post.content, post.category, post.auteur])
+    return insertRequest.run([post.name, post.content, post.category, post.lien, post.auteur])
   }))
 }
 
 async function createCommentaire(db){
   const insertRequest = await db.prepare("INSERT INTO commentaires(name, content, article, iduser, numcom) VALUES(?, ?, ?, ?, ?)")
   const commentaire = [{
-    name: "Commentaire 1",
-    content: "Lorem lipsum, Lorem lipsum Lorem lipsum Lorem lipsum",
+    name: "Les télécommunications",
+    content: "C'est trop génial",
     article: 1,
     iduser: 2,
     numcom: 1,
   },
     {
-      name: "Commentaire 2 x 1",
-      content: "Un autre com",
+      name: "réponse",
+      content: "t'as raison",
       article: 1,
       iduser: 2,
       numcom: 2,
     }, 
     {
-      name: "Commentaire 2",
-      content: "Lorem lipsum, Lorem lipsum Lorem lipsum Lorem lipsum",
+      name: "Les communications numérique",
+      content: "Le partiel était un peu dur",
       article: 2,
       iduser: 1,
       numcom: 1,
+    },
+    {
+      name: "La prog web c'est trop bien",
+      content: "Youpi",
+      article: 3,
+      iduser: 2,
+      numcom: 1,
+    }, 
+    {
+      name: "réponse",
+      content: "Fayot",
+      article: 3,
+      iduser: 1,
+      numcom: 2,
     }
   ]
   return await Promise.all( commentaire.map(comm => {
@@ -98,23 +112,23 @@ async function createCommentaire(db){
 async function createAvis(db){
   const insertRequest = await db.prepare("INSERT INTO avis(dislike, like, article) VALUES(?, ?, ?)")
   const avis = [{
-    dislike: 0,
-    like: 0,
+    dislike: 3,
+    like: 88,
     article: 1
   }, 
   {
-    dislike: 0,
-    like: 0,
+    dislike: 7,
+    like: 22,
     article: 2
   }, 
   {
     dislike: 0,
-    like: 0,
+    like: 261,
     article: 3
   }, 
   {
-    dislike: 0,
-    like: 0,
+    dislike: 2,
+    like: 23,
     article: 4
     
   }

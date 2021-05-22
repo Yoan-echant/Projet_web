@@ -23,6 +23,9 @@ block body
                             if (logged)
                                 li.nav-item
                                     a.nav-link(href="/post/create" class="link-dark").bg-green Créer un nouveau post 
+                            if (logged)
+                                li.nav-item
+                                    a.nav-link(href="/visite" class="link-dark").bg-green Visite
                             if(logged)
                                 li.nav-item
                                     a.nav-link(href="/logout" class="link-dark").bg-green Se deconnecter
@@ -33,6 +36,9 @@ block body
                             if(!logged)
                                 li.nav-item
                                     a.nav-link(href="/signup" class="link-dark") Créer un compte 
+                            if(logged)
+                                li.nav-item
+                                    a.nav-link(href="/profile" class="link-dark") Profil
                             img(src='https://upload.wikimedia.org/wikipedia/fr/thumb/5/58/Reddit_logo_new.svg/1200px-Reddit_logo_new.svg.png' style="width:80px; height:40px" )
                            
        
@@ -66,15 +72,18 @@ block body
                                                         
                                                                 if !categoryActive
                                                                     span.badge.rounded-pill.bg-primary=posts[indexToSearch].cat_name
-                                                                span.badge.rounded-pill.bg-secondary author
-                                                                span.badge.rounded-pill.bg-secondary 01/01/01
+                                                                span.badge.rounded-pill.bg-primary author
+                                                                span.badge.rounded-pill.bg-primary 01/01/01
                                                             
                                                             p=posts[indexToSearch].content
-                                                            
-                                                            form(action="/post/" + posts[indexToSearch].id )
-                                                                input(type="submit" value="Découvrir")
-                                                            p=posts[indexToSearch].lien
-                                                            
+                                                            div.row
+                                                                div.col.text-center-3
+                                                                    form(action="/post/" + posts[indexToSearch].id )
+                                                                        input(type="submit" value="Découvrir")
+                                                                div.col.text-center-3      
+                                                                    form(action=posts[indexToSearch].lien)
+                                                                        input(type="Submit" value="Lien")
+                                                                
                                                             div.p-2
                                                         
                         if posts.length <= 0

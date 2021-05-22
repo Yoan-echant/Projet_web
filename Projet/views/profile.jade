@@ -8,52 +8,62 @@ block body
                           ul.nav.nav-pills.justify-content-end.bg-danger
                             if(data.logged)
                                 li.nav-item
-                                    a.nav-link(href="/tendance") Tendance
+                                    a.nav-link(href="/" class="link-dark") Accueil
                                 li.nav-item
-                                    a.nav-link(href="/categories") Editer categories
+                                    a.nav-link(href="/tendance" class="link-dark") Tendance
+                                li.nav-item
+                                    a.nav-link(href="/categories" class="link-dark") Editer categories
                                 li.nav-item
                                     a.nav-link(href="/post/create" class="link-dark").bg-green Créer un nouveau post 
                                 li.nav-item
                                     a.nav-link(href="/logout" class="link-dark").bg-green Se deconnecter
+                                 
+                                li.nav-item
+                                    a.nav-link(href="/visite" class="link-dark") Visite 
                                     
                             if(!data.logged)
+                                li.nav-item
+                                    a.nav-link(href="/" class="link-dark") Accueil
                                 li.nav-item
                                     a.nav-link(href="/login" class="link-dark") Se connecter
                                 li.nav-item
                                     a.nav-link(href="/signup" class="link-dark") Créer un compte 
+                                
                             img(src='https://upload.wikimedia.org/wikipedia/fr/thumb/5/58/Reddit_logo_new.svg/1200px-Reddit_logo_new.svg.png' style="width:80px; height:40px" )
     
         div.row
             div.col
                 div.bg-light.p-5
                     div.container
-                        h1.text-center=categoryActive ? categoryActive.cat_name : "Profile"
+                        h1.text-center=categoryActive ? categoryActive.cat_name : "Profil"
         
 
         div.row
             div.col
                 div.bg-light.p-5
                     if (data.logged)
-                        if errors
-                            div.p-2.alert.alert-danger
-                                h4=errors
-                        .p-2
-                            p="Votre nom d'utilisateur est:" + data.username
-                        .p-2 
-                            p= "Votre adresse mail est:" + data.mail
-                        .p-2 
-                            h4= "Changer de mot de passe:" 
-                        form(method="POST" action="/changemdp")
-                            div.p-2
-                                label(for="current_password") current_password
-                                    input(type="password" id="current_password" name="current_password")
-                            div.p-2
-                                label(for="password") Password
-                                    input(type="password" id="password" name="password")
-                            div.p-2
-                                label(for="password_ver") Vérification de mot de passe
-                                    input(type="password" id="password_ver" name="password_ver")
-                            div.flex.p-2
-                                form(method="POST" action="/changemdp")
-                                    input(type="submit" value="Changer de mot de passe")
+                        
+                            if errors
+                                div.p-2.alert.alert-danger
+                                    h4=errors
+                            img(src="https://static.jobat.be/uploadedImages/grandprofilfb.jpg"  style="width:300px; height:200px")
+                            .p-2
+                                p="Votre nom d'utilisateur est : " + data.username
+                            .p-2 
+                                p= "Votre adresse mail est : " + data.mail
+                            .p-2 
+                                h4= "Changer de mot de passe:" 
+                            form(method="POST" action="/changemdp")
+                                div.p-2
+                                    label(for="current_password") current_password
+                                        input(type="password" id="current_password" name="current_password")
+                                div.p-2
+                                    label(for="password") Password
+                                        input(type="password" id="password" name="password")
+                                div.p-2
+                                    label(for="password_ver") Vérification de mot de passe
+                                        input(type="password" id="password_ver" name="password_ver")
+                                div.flex.p-2
+                                    form(method="POST" action="/changemdp")
+                                        input(type="submit" value="Changer de mot de passe")
 

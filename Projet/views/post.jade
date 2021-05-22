@@ -27,6 +27,12 @@ block body
                             if(!logged)
                                 li.nav-item
                                     a.nav-link(href="/signup" class="link-dark") Créer un compte 
+                            if(logged)
+                                li.nav-item
+                                    a.nav-link(href="/visite" class="link-dark") Visite 
+                            if(logged)
+                                li.nav-item
+                                    a.nav-link(href="/profile" class="link-dark") Profil
                             img(src='https://upload.wikimedia.org/wikipedia/fr/thumb/5/58/Reddit_logo_new.svg/1200px-Reddit_logo_new.svg.png' style="width:80px; height:40px" )
                            
        
@@ -48,12 +54,14 @@ block body
                         span.badge.rounded-pill.bg-secondary 01/01/01
                     .card-body
                         p=post.content
+                        
                         div.row
                                 div.p-2
                                     .row 
                                         div.col-2
-                                            form(action="/commentaire/"+post.id method="GET")
-                                                        input(type="Submit" value="Ajouter un commentaire")
+                                            form(action=post.lien)
+                                                input(type="Submit" value="Lien")
+                                            
                                         div.col-2
                                             form(action="/post/" + post.id + "/edit" method="GET")
                                                     input(type="Submit" value="Editer") 
@@ -88,13 +96,16 @@ block body
                                     .card.bg-dark.text-white
                                         .card-header
                                             .p-2  
-                                                p='objet : '  + commentaire_name[idcom-1]
+                                                p= " Nom d'Utilisateur : " + data.user
+                                                p='Objet : '  + commentaire_name[idcom-1]
                                         .card-body
                                             .p-2      
-                                                p=commentaire_content[idcom-1]                        
-                                                div.col-2
-                                                    form(action="/commentaire/" + post.id + "/delete/" + idcom method="GET")
-                                                        input(type="Submit" value="Supprimer le commentaire")
-                                                    form(action="/commentaire/" + post.id + "/edit/" + idcom method="GET")
-                                                        input(type="Submit" value="editer le commentaire")
+                                                p=commentaire_content[idcom-1] 
+                                                div.row                       
+                                                    div.col-1
+                                                        form(action="/commentaire/" + post.id + "/delete/" + idcom method="GET")
+                                                            input(type="image" src="https://images.emojiterra.com/mozilla/512px/1f6ae.png" style="width:80px; height:60px")
+                                                    div.col-1 
+                                                        form(action="/commentaire/" + post.id + "/edit/" + idcom method="GET")
+                                                            input(type="image" src="https://img2.freepng.fr/20180414/jww/kisspng-paper-and-pencil-game-emojipedia-paper-and-pencil-pencil-5ad2cb033d00d1.5031300915237639712499.jpg" style="width:80px; height:60px")
                                     .p-2           
