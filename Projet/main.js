@@ -26,6 +26,10 @@ const authentification = {
 }
 
 
+
+
+
+
 if (app.get('env') === 'production') {
   app.set('trust proxy', 1) // trust first proxy
   sess.cookie.secure = true // serve secure cookies
@@ -38,19 +42,35 @@ app.set('views', './views');
 app.set('view engine', 'jade');
 
 
+
 const categories = [
   {id: 'home', name: 'Accueil', link:"/"},
   {id: 'cat1', name: 'Catégorie 1', link:"/cat1"},
   {id: 'cat2', name: 'Catégorie 2', link:"/cat2"}
 ]
 
+
+//Separation
+
+
 app.post('/blog',(req, res) => {
   res.redirect(302,'/')
 })
 
+
+//Separation
+
+
+
 app.get('/login',(req, res) => {
   res.render('login', {logged: req.session.logged, numuser: req.session.numuser})
 })
+
+
+
+//Separation
+
+
 
 app.post('/login',async(req, res) => {
   const username = req.body.username
@@ -106,9 +126,18 @@ app.post('/login',async(req, res) => {
   res.render('login',data)
 })
 
+
+//Separation
+
+
+
 app.get('/signup',(req, res) => {
   res.render('signup')
 })
+
+
+//Separation
+
 
 app.post('/signup',async (req, res) => {
   const mail = req.body.mail
@@ -196,6 +225,9 @@ app.post('/signup',async (req, res) => {
 })
 
 
+//Separation
+
+
 app.get('/tendance', async(req,res) =>{
   const db = await openDb()
   const categories = await db.all(`
@@ -219,30 +251,43 @@ app.post('/tendance', async(req,res) =>{
 
 
 
+//Separation
+
+
+
 app.get('/visite', async(req,res) =>{
   if (req.session.logged == false){
     res.redirect('/login')
   }
-  numerouser = req.session.numuser
-  //console.log(numerouser)
-  const db = await openDb()
-  const categories = await db.all(`
-    SELECT * FROM categories
-  `)
-  let posts = []
-  posts = await db.all(`
-    SELECT * FROM posts
-    INNER JOIN visite on visite.article = posts.id
-    INNER JOIN postupdate on postupdate.article = posts.id
-    WHERE visite.user= ? AND postupdate.lastupdate > visite.date AND visite.date + 86400000 > ?
-  `,[numerouser, Date.now()])
-  //console.log(posts)
-  res.render("visite",{posts: posts,categories: categories, logged: req.session.logged, numuser: req.session.numuser})
+  else{
+    numerouser = req.session.numuser
+    //console.log(numerouser)
+    const db = await openDb()
+    const categories = await db.all(`
+      SELECT * FROM categories
+    `)
+    let posts = []
+    posts = await db.all(`
+      SELECT * FROM posts
+      INNER JOIN visite ON visite.article = posts.id
+      INNER JOIN postupdate ON postupdate.article = posts.id
+      WHERE visite.user= ? AND postupdate.lastupdate > visite.date AND visite.date + 86400000 > ?
+    `,[numerouser, Date.now()])
+    console.log(posts)
+    res.render("visite",{posts: posts,categories: categories, logged: req.session.logged, numuser: req.session.numuser})
+  }
 })
+
+
+//Separation
+
 
 app.post('/visite', async(req,res) =>{
   res.redirect('/tendance')
 })
+
+
+//Separation
 
 
 
@@ -255,6 +300,10 @@ app.get('/logout',(req, res) => {
     res.redirect(302,'/')
  }
 })
+
+//Separation
+
+
 app.get('/lecture', async (req, res) => {
   const db = await openDb()
 
@@ -273,6 +322,8 @@ app.get('/lecture', async (req, res) => {
   
 })
 
+
+//Separation
 
 
 app.get('/profile', async (req, res) => {
@@ -305,6 +356,11 @@ app.get('/profile', async (req, res) => {
     res.render('profile', data)
   }
 })
+
+
+
+//Separation
+
 
 app.post('/changemdp', async (req, res) => {
   const db = await openDb()
@@ -363,39 +419,71 @@ app.post('/changemdp', async (req, res) => {
 })
 
 
+//Separation
+
+
 app.get('/commentaires2', async (req, res) => {
   res.render("commentaires")
 })
+
+//Separation
+
 
 app.post('/commentaire/:id', async (req, res) => {
   if(!req.session.logged){
     res.redirect(302,'/login')
     return
   }
-  //console.log("salut")
-  const db = await openDb()
-  const id = req.params.id
-  const iduser = req.session.numuser
-  const name = req.body.name
-  const content = req.body.content
+  else {
+    //console.log("salut")
+    const db = await openDb()
+    const id = req.params.id
+    const iduser = req.session.numuser
+    const name = req.body.name
+    const content = req.body.content
 
-  const numcomliste = await db.all(`
-    SELECT id FROM commentaires
-    WHERE article = ?
-  `,[id])
- 
-  const numcom = numcomliste.length + 1
-  const article = id
-
-  //console.log("article:"+ id +" utilisateur:"+ iduser + " commentaire:" + numcom)
-
-  const commdate = await db.run(`
-    INSERT INTO commentaires(name, content, article, iduser, numcom)
-    VALUES(?, ?, ?, ?, ?)
+    const numcomliste = await db.all(`
+      SELECT id FROM commentaires
+      WHERE article = ?
+    `,[id])
   
-  `,[name, content, article, iduser, numcom])
-  
-  res.redirect('/post/'+id)
+    const numcom = numcomliste.length + 1
+    const article = id
+
+    //console.log("article:"+ id +" utilisateur:"+ iduser + " commentaire:" + numcom)
+
+    const commdate = await db.run(`
+      INSERT INTO commentaires(name, content, article, iduser, numcom)
+      VALUES(?, ?, ?, ?, ?)
+    
+    `,[name, content, article, iduser, numcom])
+    
+
+    const exist_date_post = await db.get(`
+      SELECT * FROM postupdate
+      WHERE article = ?
+    `,[id])
+
+    if (typeof(exist_date_post) == typeof(unevariablenondéfinie)){
+      console.log("cas non definie article")
+      console.log(" id "+ id + " time: "+ Date.now())
+      const add_update_post = await db.run(`
+        INSERT INTO postupdate(article, date)
+        VALUES(?, ?)
+      `,[id, Date.now()])
+    }
+
+    else {
+      console.log("Cas definie article:"+id+" date "+ Date.now())
+      const update_date_post = await db.run(`
+        UPDATE postupdate
+        SET lastupdate = ?
+        WHERE article = ?
+      `,[Date.now(), id])
+    }
+
+    res.redirect('/post/'+id)
+  }
 })
 
 app.get('/commentaire/:id/delete/:idcom', async (req, res) => {
@@ -529,84 +617,118 @@ app.post('/post/create', async (req, res) => {
 })
 
 app.get('/post/:id', async (req, res) => {
-  const db = await openDb()
-  const id = req.params.id
-  const numuser = req.session.numuser
-  const name=req.session.userdata
-  const post = await db.get(`
-    SELECT * FROM posts
-    LEFT JOIN categories on categories.cat_id = posts.category
-    WHERE id = ?
-  `,[id])
-  let aviss = await db.get(`
-    SELECT like,dislike  FROM avis
-    WHERE article = ?
-  `,[id])
+  if (!req.session.logged){
+    res.redirect('/login')
+  }
+  else{
 
-  if (
-    typeof(aviss)==typeof(unevariablenondéfinie)
-    ){
-      const newavis= await db.run(`
-        INSERT INTO avis(like, dislike, article)
+    const db = await openDb()
+    const id = req.params.id
+    const numuser = req.session.numuser
+    const name=req.session.userdata
+
+    const visite = await db.get(`
+      SELECT * FROM visite
+      WHERE user = ?
+    `,[numuser])
+
+    if (typeof(visite) == typeof(unevariablenondéfinie)){
+      console.log("cas non definie, visite")
+      console.log(numuser + " id "+ id + " time: "+ Date.now())
+      const add_visite = await db.run(`
+        INSERT INTO visite(user, article, date)
         VALUES(?, ?, ?)
-      `,[0, 0, id])
-      aviss = await db.get(`
+      `,[numuser, id, Date.now()])
+      console.log(3)
+    }
+
+    else {
+      console.log("cas définie visite" + Date.now())
+      const update_visite = await db.run(`
+        UPDATE visite
+        SET date = ?
+        WHERE user = ?
+      `,[Date.now(), numuser])
+    }
+    
+    const post = await db.get(`
+      SELECT * FROM posts
+      LEFT JOIN categories on categories.cat_id = posts.category
+      WHERE id = ?
+    `,[id])
+    
+    let aviss = await db.get(`
       SELECT like,dislike  FROM avis
       WHERE article = ?
     `,[id])
-  }
-  const aviuser = await db.get(`
-    SELECT etat  FROM liketab
-    WHERE user = ? AND article = ?
-  `,[numuser, id])
-  
-  const commentaire = await db.all(`
-    SELECT name,content FROM commentaires 
-    WHERE article = ?
-  `,[id]) 
-  const commentaire2 = await db.all(`
-    SELECT numcom FROM commentaires 
-    WHERE article = ?
-  `,[id])
-  const auteur= await db.get(`
-    SELECT username FROM userdata
-    WHERE id = ?
-  `[post.auteur])
-  let currentavis = 0
-  if (typeof(aviuser) == typeof(unevariablenondéfinie)){
-    //console.log("On set a 0")
-  }
-  else {
-    //console.log("On set depuis la bdd a:", aviuser.etat)
-    currentavis = aviuser.etat
-  }
+    
+    if (
+      typeof(aviss)==typeof(unevariablenondéfinie)
+      ){
+        const newavis= await db.run(`
+          INSERT INTO avis(like, dislike, article)
+          VALUES(?, ?, ?)
+        `,[0, 0, id])
+        aviss = await db.get(`
+        SELECT like,dislike  FROM avis
+        WHERE article = ?
+      `,[id])
+    }
+    const aviuser = await db.get(`
+      SELECT etat  FROM liketab
+      WHERE user = ? AND article = ?
+    `,[numuser, id])
+    
+    const commentaire = await db.all(`
+      SELECT name,content FROM commentaires 
+      WHERE article = ?
+    `,[id]) 
+    const commentaire2 = await db.all(`
+      SELECT numcom FROM commentaires 
+      WHERE article = ?
+    `,[id])
+    console.log(post.auteur)
+    const auteur= await db.get(`
+      SELECT username FROM userdata
+      WHERE id = ?
+    `,[post.auteur])
 
-  const commentaire_nb = commentaire.length
-  let commentaire_content =Array.from({ length: commentaire_nb }, (_, i) => i)
-  let commentaire_name =Array.from({ length: commentaire_nb }, (_, i) => i)
-  
-  //console.log(commentaire2)
-  for (let k = 0; k < commentaire_nb; k++){
-    //console.log(commentaire[k])
-    console.log("numcom: "+ commentaire2[k].numcom)
-    commentaire_content[k]= commentaire[k].content
-    commentaire_name[k]= commentaire[k].name
-  }
+    let currentavis = 0
+    if (typeof(aviuser) == typeof(unevariablenondéfinie)){
+      //console.log("On set a 0")
+    }
+    else {
+      //console.log("On set depuis la bdd a:", aviuser.etat)
+      currentavis = aviuser.etat
+    }
 
-  //console.log(commentaire_content)
-  //console.log(commentaire_name)
+    const commentaire_nb = commentaire.length
+    let commentaire_content =Array.from({ length: commentaire_nb }, (_, i) => i)
+    let commentaire_name =Array.from({ length: commentaire_nb }, (_, i) => i)
+    
+    //console.log(commentaire2)
+    for (let k = 0; k < commentaire_nb; k++){
+      //console.log(commentaire[k])
+      console.log("numcom: "+ commentaire2[k].numcom)
+      commentaire_content[k]= commentaire[k].content
+      commentaire_name[k]= commentaire[k].name
+    }
+
+    //console.log(commentaire_content)
+    //console.log(commentaire_name)
 
 
-  const array_com = Array.from({ length: commentaire_nb }, (_, i) => i+1)
-  //console.log(array_com)
-  const data = {
-    like:aviss.like,
-    dislike:aviss.dislike,
-    useropinion: currentavis,
-    user: req.session.userdata
-}
+    const array_com = Array.from({ length: commentaire_nb }, (_, i) => i+1)
+    //console.log(array_com)
+    const data = {
+      like:aviss.like,
+      dislike:aviss.dislike,
+      useropinion: currentavis,
+      user: req.session.userdata
+    }
 
-  res.render("post",{post: post, numuser: numuser, logged: req.session.logged, data, commentaire_name, commentaire_content, commentaire_nb, array_com})
+    res.render("post",{post: post, numuser: numuser, logged: req.session.logged, data, commentaire_name, commentaire_content, commentaire_nb, array_com})
+  } 
 })
 
 app.post('/like/:id', async (req, res) => {

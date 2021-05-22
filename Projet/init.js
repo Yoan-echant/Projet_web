@@ -1,6 +1,6 @@
 const {openDb} = require("./db")
 
-const tablesNames = ["categories","posts","userdata", "commentaires", "avis", "visite", "liketab"]
+const tablesNames = ["categories","posts","userdata", "commentaires", "avis", "visite", "liketab", "postupdate"]
 
 
 
@@ -170,8 +170,8 @@ async function createpostlastupdate(db){
     lastupdate: Date.now()
   }
   ]
-  return await Promise.all( update.map(update => {
-    return insertRequest.run([update.article, update.lastupdate])
+  return await Promise.all( update.map(upd => {
+    return insertRequest.run([upd.article, upd.lastupdate])
   }))
 }
 async function createTables(db){
