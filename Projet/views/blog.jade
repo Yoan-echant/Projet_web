@@ -41,7 +41,7 @@ block body
             div.col
                 div.bg-light.p-5
                     div.container
-                        h1.text-center=categoryActive ? categoryActive.cat_name : "Acceuil"
+                        h1.text-center=categoryActive ? categoryActive.cat_name : "Edit commentaire"
         
         
         div.row.mt
@@ -76,14 +76,7 @@ block body
                                                             p=posts[indexToSearch].lien
                                                             
                                                             div.p-2
-                                                        
-                        if posts.length <= 0
-                            div.col
-
-         div.row
-            div.col
-                div.bg-light.p-6
-                    a(href=posts[1].lien )
+    
          
         
 

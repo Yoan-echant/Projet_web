@@ -124,24 +124,12 @@ async function createAvis(db){
   }))
 }
 
-async function createVisite(db){
-  const insertRequest = await db.prepare("INSERT INTO visite(user, article) VALUES(?, ?)")
-  const visite = [{
-    user: 2,
-    article: 1
-  }
-  ]
-  return await Promise.all( visite.map(vis => {
-    return insertRequest.run([vis.user, vis.article])
-  }))
-}
-
 async function createLiketab(db){
   const insertRequest = await db.prepare("INSERT INTO liketab(user, article, etat) VALUES(?, ?, ?)")
   const like = [{
     user: 3,
     article: 1,
-    etat: 0 //0 neutre, 1 like, 2 dislike
+    etat: 0, //0 neutre, 1 like, 2 dislike
   }
   ]
   return await Promise.all( like.map(like => {
@@ -149,6 +137,29 @@ async function createLiketab(db){
   }))
 }
 
+async function createVisite(db){
+  const insertRequest = await db.prepare("INSERT INTO visite(user, article, date) VALUES(?, ?, ?)")
+  const lastvis = [{
+    user: 2,
+    article: 1,
+    date: Date.now()
+  }
+  ]
+  return await Promise.all( lastvis.map(lastvis => {
+    return insertRequest.run([lastvis.user, lastvis.article, lastvis.date])
+  }))
+}
+async function createpostlastupdate(db){
+  const insertRequest = await db.prepare("INSERT INTO postupdate(article, lastupdate) VALUES(?, ?)")
+  const update = [{
+    article: 1,
+    lastupdate: Date.now()
+  }
+  ]
+  return await Promise.all( update.map(update => {
+    return insertRequest.run([update.article, update.lastupdate])
+  }))
+}
 async function createTables(db){
   const cat = db.run(`
     CREATE TABLE IF NOT EXISTS categories(
@@ -156,6 +167,24 @@ async function createTables(db){
       cat_name varchar(255)
     )
   `)
+  const visite = db.run(`
+    CREATE TABLE IF NOT EXISTS visite(
+      id INTEGER PRIMARY KEY,
+      user int,
+      article int,
+      date int,
+      FOREIGN KEY(user) REFERENCES userdata(id),
+      FOREIGN KEY(article) REFERENCES posts(id)
+    )
+  `)
+  const update = db.run(`
+  CREATE TABLE IF NOT EXISTS postupdate(
+    id INTEGER PRIMARY KEY,
+    article int,
+    lastupdate int,
+    FOREIGN KEY(article) REFERENCES posts(id)
+  )
+`)
   const post = db.run(`
         CREATE TABLE IF NOT EXISTS posts(
           id INTEGER PRIMARY KEY,
@@ -166,7 +195,7 @@ async function createTables(db){
           article int,
           auteur int,
           FOREIGN KEY(category) REFERENCES categories(cat_id),
-          FOREIGN KEY(auteur) REFERENCES users(id)
+          FOREIGN KEY(auteur) REFERENCES userdata(id)
         )
   `)
   const users = db.run(`
@@ -187,7 +216,7 @@ async function createTables(db){
           iduser int,
           numcom int,
           FOREIGN KEY(article) REFERENCES post(id),
-          FOREIGN KEY(iduser) REFERENCES user(id)
+          FOREIGN KEY(iduser) REFERENCES userdata(id)
         )
   `)
   const avis= db.run(`
@@ -199,14 +228,7 @@ async function createTables(db){
           FOREIGN KEY(article) REFERENCES post(id)
         )
 `)
-const visite = db.run(`
-        CREATE TABLE IF NOT EXISTS visite(
-          id INTEGER PRIMARY KEY,
-          user int,
-          article int,
-          FOREIGN KEY(article) REFERENCES post(id)
-        )
-  `)
+
   const liketab = db.run(`
         CREATE TABLE IF NOT EXISTS liketab(
           id INTEGER PRIMARY KEY,
@@ -216,7 +238,7 @@ const visite = db.run(`
           FOREIGN KEY(article) REFERENCES post(id)
         )
   `)
-  return await Promise.all([cat, post, users, commentaire, avis, visite, liketab])
+  return await Promise.all([cat, post, users, commentaire, avis, visite, liketab, update])
 }
 
 
@@ -241,4 +263,5 @@ async function dropTables(db){
   await createAvis(db)
   await createVisite(db)
   await createLiketab(db)
+  await createpostlastupdate(db)
 })()

@@ -6,9 +6,9 @@ block body
                 div.header.bg-danger
                     nav.d-flex.justify-content-center.align-items-center
                           ul.nav.nav-pills.justify-content-end.bg-danger
-                            li.nav-item
+                            //li.nav-item
                                 a.nav-link(href="/" class=!categoryActive ? "active" : "" class="link-dark") Acceuil
-                             each cat in categories
+                            //each cat in categories
                                 li.nav-item
                                     a.nav-link(href="/"+ cat.cat_id class=categoryActive && categoryActive.cat_id  === cat.cat_id ? "active" : "" class="link-dark")=cat.cat_name
                             if(logged)
@@ -47,14 +47,14 @@ block body
                     form(method="POST" action="/commentaire/"+ data.id + "/edit/"+ data.idcom)
                         div.p-2
                             label(for="name") name
-                                input(type="text" id="name" name="name")
+                                input(value=data.name id="name" name="name")
                         div.p-2
                             label(for="content") Content
-                                input(type="text" id="content" name="content")
+                                input(value= data.content id="content" name="content")
                         div.flex.p-2
                             form(method="POST" action="/commentaire/"+ data.id + "/edit/"+ data.idcom)
                                 input(type="submit" value="Confirmer l'edition")
                         div.flex.p-2
-                            form(method="POST" action="/post/"+id)
+                            form(method="GET" action="/post/"+id)
                                 input(type="submit" value="Annuler l'edition")       
                     

@@ -34,9 +34,9 @@ block body
             div.col
                 div.bg-light.p-5
                     if (data.logged)
-                        if errors
+                        if data.erreur
                             div.p-2.alert.alert-danger
-                                h4=errors
+                                h4=data.erreur
                         .p-2
                             p="Votre nom d'utilisateur est:" + data.username
                         .p-2 
@@ -57,3 +57,48 @@ block body
                                 form(method="POST" action="/changemdp")
                                     input(type="submit" value="Changer de mot de passe")
 
+
+        div.row.mt
+            div.col
+                .bg-light
+                
+                    each postToRow, index in posts
+                        if index % 3 === 0
+                            div.row
+                                
+                                    each indexToSearch in [index, index + 1, index + 2]
+                                        if posts[indexToSearch]
+                                        
+                                            div.col.text-center
+                                                div.p-2
+                                                
+                                                    .card
+                                                        
+                                                        
+                                                            .card-header 
+                                                                h4=posts[indexToSearch].name
+                                                        
+                                                                if !categoryActive
+                                                                    span.badge.rounded-pill.bg-primary=posts[indexToSearch].cat_name
+                                                                span.badge.rounded-pill.bg-primary author
+                                                                span.badge.rounded-pill.bg-primary 01/01/01
+                                                            
+                                                            p=posts[indexToSearch].content
+                                                            
+                                                            form(action="/post/" + posts[indexToSearch].id )
+                                                                input(type="submit" value="Découvrir")
+                                                            p=posts[indexToSearch].lien
+                                                            div.row
+                                                                div.col-6
+                                                                    img(class="rounded img-fluid" src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Facebook_Like_button.svg/1200px-Facebook_Like_button.svg.png"  style="width:40px; height:40px" )
+                                                                    p= posts[indexToSearch].like
+                                                                div.col-6
+                                                                    img(class="rounded img-fluid" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAATMAAACkCAMAAADMkjkjAAAAkFBMVEX39/f4AAD7AAD3+/v3///5h4f7Ojr4xsbxzc33/Pz3w8P4wcH38fH31tb35eX3vLz339/32Nj37e34ZWX4Hx/3q6v3ysr3m5v4S0v4QED4a2v4Rkb3i4v3o6P4NDT3r6/3k5P4FRX4cnLfrKz4Kyv3trb4VVX6Kir4cXH5np75hIT4eXnuurrdqqrZoqL4ISGqhAkoAAAExklEQVR4nO2d6XbaMBBG7UiQGIxtIJid4LTQLF3e/+2KIWmb4jEIy/aH892fOeEcuEejbaSR4xBCCCGEEEIIIYRcihKo+3sBsbPh6Tccx/f9XqfTzSDyd//22c0pL5XgB3E8Wixak+l06uaTzFthoL26v/f5SBFzSRylLcsZ9Dbr2fz+hKcjpqOBruYXF0V50Z0BkWhtryuIx9uvprL+snCuIUJVMLwxYhodh1DabakgXg5Xl+s6sIrwm5qKzIylxP9I2/fyqv+wHha19c4DvDT1zdyZ6799dqcrul2+/rKl68CThx2f3sZc2c3N86GhhethYlfXgbkPLU2/XOJsnoaP6pbha88KWppuXeKsvXfWKc2ZO0Hu00CduQtgaajO3Ag3OmGdveI2NFhniV+3GhFYZ24fNjhxncV0ZgzbmTmDutWIwDpL6MwcOjOHY4A5M9hJLa4zN0bNqAA7S1A3hICduVPQhobszB1idmnQztwnSGnYztxHRGngziC30dCduRu8gQDemVu3oWPwnT3ANTR8Z2M6o7MK6MKtoPCd4eWf4J0BTtCKOPtehbMeXGjCO0M87ILuDHAZAO8MbwSAd7YFDE10Z43bC6IzSGcrOjNnAygN3ZnbxZMG7wwwNYzvDO808hU4m6A1tCtw5oZgDe0anM3BhoFrcOYOsBpaEWdfqnIGdnyvkLObipzd0pkxAZ2ZMm3QGFCVsxBsgnYFzuAOI+M7m9St6Ah4Z/d4ZYTgnaF1Zs4VOKtbUAbwztAGAKeYsx9VOAO8xgnvbI3X0IrUcanEmYt3g+eyekHLdDBTPytxBniYylmZK3ur4zDoR5tFgfpwZ4KXRLmk/tnd269Ia5+p0LgEoSFf6xWUhRdszYxNPtbZ87yXkqUBDgNKB53bs+n09f+dsh6VLA1sb3tP0bqhelOusxFcj2YBvS7V2QtecFpAW6uAmUWrkc4cx3IdzA/cAfZnFlC98pTdN1NZqYPnuKGhma5cy3IGlqqziTcpR1kzR80DSn0rxRniFQFrqCApQRnePWGreJF9ZXDZTdt4t7aVtev+SeWjLdfgxi68bQk9tqms/RmU7aQt7Clr4eXQy0Fv7QhLJv2md/9/UE67oKykvV0s+z74axVWUcEJKS+j3p54OU5ZLkebMAy7d4e/RrvhV+vPJCzlxOCZ7IQc8P7Ad9j0a54z0Op5tZO38mzk7n5xVJzjDLBiBgT6UXaGWxS6XtSAzozJWQ7A3ceEwRedNXd7vyiemFNJ6ExCi+mBLicbAvISqs2GJiFvpXFWKyM9+prU/cVw8cS1OuApPBS8uSQN8RQeBvKyE/mpyJrxxGesG50cL4Q8seXQKSKuoNDumAMhnxlt8AGpgqhQctbwoyuFkJxx5BTRM8EZMykiSrpuQWc5JHRmirTJTWcyqk9nxqhppjPMZ9VAEILzmfMzGWFzA62wJRiZzngCIY/sDo2hmUfmUoD7GrlkXh7jcjOXzI1Hdme5qIz0E1ppYzSy3hvDe4QOi4xr15DP6UBxnBTgxvYpjpwB1miE4z9lz4zMk+iP9b54zvEM9IdseofKzuDfE4/DAfuyc1CD9xXnsHdUCIxko/RmOJu9hj6NGaD0DgojhBBCCCGEEELInt8di3KLjYbIQwAAAABJRU5ErkJggg=="  style="width:40px; height:40px" )
+                                                                    p= posts[indexToSearch].dislike
+                                                                
+                                                            div.p-2
+                                                        
+                        if posts.length <= 0
+                            div.col
+
+       

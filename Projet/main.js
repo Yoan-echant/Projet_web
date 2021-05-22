@@ -65,19 +65,19 @@ app.post('/login',async(req, res) => {
     if (
       test == 0
     ){
-      const users = await db.all(`
+      const users = await db.get(`
         SELECT username FROM userdata
         WHERE id =?
       ` ,[step])
-      const users_pass = await db.all(`
+      const users_pass = await db.get(`
         SELECT password FROM userdata
         WHERE id =?
       ` ,[step])
-      if(username == users[0].username
+      if(username == users.username
         ){
           test = 1
           if(
-            password == users_pass[0].password
+            password == users_pass.password
           ) {
             req.session.logged = true
             req.session.numuser= step
@@ -233,8 +233,9 @@ app.get('/visite', async(req,res) =>{
   posts = await db.all(`
     SELECT * FROM posts
     INNER JOIN visite on visite.article = posts.id
-    WHERE user= ?
-  `,[numerouser])
+    INNER JOIN postupdate on postupdate.article = posts.id
+    WHERE visite.user= ? AND postupdate.lastupdate > visite.date AND visite.date + 86400000 > ?
+  `,[numerouser, Date.now()])
   //console.log(posts)
   res.render("visite",{posts: posts,categories: categories, logged: req.session.logged, numuser: req.session.numuser})
 })
@@ -285,10 +286,20 @@ app.get('/profile', async (req, res) => {
         SELECT * FROM userdata
         WHERE id = ?
     `, [iduser])
+    post= await db.all(`
+      SELECT * FROM posts
+      INNER JOIN visite ON visite.article = posts.id
+      WHERE visite.user= ?
+      ORDER BY visite.date DESC
+    `,[iduser])
+    if ( typeof(post) == typeof(unevariablenondéfinie)){
+      post=[]
+    }
     data={
       username: user.username,
       mail: user.mail,
-      logged: req.session.logged
+      logged: req.session.logged,
+      posts: post
     }
     console.log(data)
     res.render('profile', data)
@@ -302,38 +313,52 @@ app.post('/changemdp', async (req, res) => {
   mdp= req.body.password
   mdp_ver=req.body.password_ver
   password = await db.get(`
-      SELECT password FROM userdata
+      SELECT * FROM userdata
       WHERE id = ?
   `, [iduser])
   let test = 0
   if (password.password != current_mdp){
     test =1
     data={
-      errors: "Mauvais mot de passe"
+      username: password.username,
+      mail: password.mail,
+      erreur: "Mauvais mot de passe",
+      logged: req.session.logged
     }
   }
   else if (mdp != mdp_ver){
     test =1
     data={
-      errors: "Les nouveaux mdp ne sont pas identique"
+      username: password.username,
+      mail: password.mail,
+      erreur: "Les nouveaux mdp ne sont pas identique",
+      logged: req.session.logged
     }
   }
   else if (mdp.length < 6){
     test =1
     data={
-      errors: "Le mot de passe doit faire au moins 6 charactère"
+      username: password.username,
+      mail: password.mail,
+      erreur: "Le mot de passe doit faire au moins 6 charactère",
+      logged: req.session.logged
     }
   }
   if (test == 0){
     changepassword = await db.run(`
-    UPDATE userdata
-    SET password = ?
-    WHERE id = ?
-  `, [mdp, iduser])
-  res.redirect("/profile")
+      UPDATE userdata
+      SET password = ?
+      WHERE id = ?
+    `, [mdp, iduser])
+    data = {
+      username: password.username,
+      mail: password.mail,
+      logged: req.session.logged
+    }
+  res.render('profile', data)
   }
   else{
-    res.redirect("/profile",data)
+    res.render('profile',data)
   }
 })
 
@@ -341,27 +366,6 @@ app.post('/changemdp', async (req, res) => {
 app.get('/commentaires2', async (req, res) => {
   res.render("commentaires")
 })
-
-
-/*app.get('/commentaire', async (req, res) => {
-  if(!req.session.logged){
-    res.redirect(302,'/login')
-    return
-  }
-  const db = await openDb()
-
-  const com = await db.all(`
-    SELECT * FROM commentaires 
-  `)
-  const data = {
-      commentaire : com
-  }
-  console.log(com)
- 
-  
-  res.render("commentaires", data)
-})
-*/
 
 app.post('/commentaire/:id', async (req, res) => {
   if(!req.session.logged){
@@ -563,6 +567,10 @@ app.get('/post/:id', async (req, res) => {
     SELECT numcom FROM commentaires 
     WHERE article = ?
   `,[id])
+  const auteur= await db.get(`
+    SELECT username FROM userdata
+    WHERE id = ?
+  `[post.auteur])
   let currentavis = 0
   if (typeof(aviuser) == typeof(unevariablenondéfinie)){
     //console.log("On set a 0")
