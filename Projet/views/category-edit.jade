@@ -10,12 +10,15 @@ block body
                                 a.nav-link(href="/" class=!categoryActive ? "active" : "" class="link-dark" ) Acceuil
                             
                             img(src='https://upload.wikimedia.org/wikipedia/fr/thumb/5/58/Reddit_logo_new.svg/1200px-Reddit_logo_new.svg.png' style="width:80px; height:40px" )
-    div.row
-        div.col
-            div.bg-light.p-5
-                input(value=category.cat_name id="name" name="name")
-        div
-            input(type="Submit" value="Sauvegarder")
-    div.row
-        form(action="/category/" + category.cat_id + "/delete" method="POST")
-            input(type="Submit" value="Delete")
+     
+    
+        form(action="/category/" + category.cat_id + "/edit" method="POST")
+            div.row
+                div.col
+                    div.bg-light.p-5
+                        input(value=category.cat_name id="name" name="name")
+                div
+                    input(type="Submit" value="Sauvegarder")
+            div.row
+                form(action="/category/" + category.cat_id + "/delete" method="POST")
+                    input(type="Submit" value="Delete")

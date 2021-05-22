@@ -206,7 +206,7 @@ app.post('/signup',async (req, res) => {
   }if (
     test == 0
   ){
-    console.log("username: "+ username +"   "+"mdp: "+ password + " mail " + mail)
+    //console.log("username: "+ username +"   "+"mdp: "+ password + " mail " + mail)
     const add_users =await db.run(`
       INSERT INTO userdata(username, password, mail)
       VALUES(?, ?, ?)
@@ -312,7 +312,7 @@ app.get('/visite', async(req,res) =>{
         cur_date[i] = jour+" "+month+" "+year
       }
     }
-    console.log(cur_date)
+    //console.log(cur_date)
     res.render("visite",{posts: posts,categories: categories, logged: req.session.logged, date: cur_date, numuser: req.session.numuser})
   }
 })
@@ -349,15 +349,15 @@ app.get('/lecture', async (req, res) => {
   const categories = await db.all(`
     SELECT * FROM categories
   `)
-  console.log(categories)
+  //console.log(categories)
   const post = await db.all(`
     SELECT * FROM posts
   `)
-  console.log(post)
+  //console.log(post)
   const commentaires = await db.all(`
     SELECT * FROM commentaires
   `)
-  console.log(commentaires)
+  //console.log(commentaires)
   
 })
 
@@ -529,8 +529,8 @@ app.post('/commentaire/:id', async (req, res) => {
     `,[id])
 
     if (typeof(exist_date_post) == typeof(unevariablenondéfinie)){
-      console.log("cas non definie article")
-      console.log(" id "+ id + " time: "+ Date.now())
+      //console.log("cas non definie article")
+      //console.log(" id "+ id + " time: "+ Date.now())
       const add_update_post = await db.run(`
         INSERT INTO postupdate(article, date)
         VALUES(?, ?)
@@ -538,7 +538,7 @@ app.post('/commentaire/:id', async (req, res) => {
     }
 
     else {
-      console.log("Cas definie article:"+id+" date "+ Date.now())
+      //console.log("Cas definie article:"+id+" date "+ Date.now())
       const update_date_post = await db.run(`
         UPDATE postupdate
         SET lastupdate = ?
@@ -584,7 +584,7 @@ app.get('/commentaire/:id/edit/:idcom', async (req, res) => {
       SELECT iduser, name, content FROM commentaires
       WHERE article = ? AND numcom = ?
     `,[id, idcom])
-    console.log("utilisateur: "+ iduser +" auteur du commentaire:"+commentaire.iduser)
+    //console.log("utilisateur: "+ iduser +" auteur du commentaire:"+commentaire.iduser)
     if (
       iduser == commentaire.iduser
     ){
@@ -619,9 +619,9 @@ app.post('/commentaire/:id/edit/:idcom', async (req, res) => {
     const numcom = req.params.idcom
     const name= req.body.name
     const content= req.body.content
-    console.log(req.params)
+    //console.log(req.params)
     //console.log("name: "+name + " content: "+ content)
-    console.log("numcom: "+numcom + " iduser: "+ iduser+ " article: "+ id)
+    //console.log("numcom: "+numcom + " iduser: "+ iduser+ " article: "+ id)
     const commdate = await db.run(`
       UPDATE commentaires
       SET content= ?, name = ?
@@ -634,8 +634,8 @@ app.post('/commentaire/:id/edit/:idcom', async (req, res) => {
     `,[id])
 
     if (typeof(exist_date_post) == typeof(unevariablenondéfinie)){
-      console.log("cas non definie article")
-      console.log(" id "+ id + " time: "+ Date.now())
+      //console.log("cas non definie article")
+      //console.log(" id "+ id + " time: "+ Date.now())
       const add_update_post = await db.run(`
         INSERT INTO postupdate(article, date)
         VALUES(?, ?)
@@ -643,7 +643,7 @@ app.post('/commentaire/:id/edit/:idcom', async (req, res) => {
     }
 
     else {
-      console.log("Cas definie article:"+id+" date "+ Date.now())
+      //console.log("Cas definie article:"+id+" date "+ Date.now())
       const update_date_post = await db.run(`
         UPDATE postupdate
         SET lastupdate = ?
@@ -706,8 +706,8 @@ app.post('/post/create', async (req, res) => {
     INSERT INTO posts(name, content, category, auteur, date_parution)
     VALUES(?, ?, ?, ?, ?)
   `,[name, content, category, iduser, Date.now()])
-  console.log("post create post : ")
-  console.log(post)
+  //console.log("post create post : ")
+  //console.log(post)
   res.redirect("/post/" + post.lastID)
 })
 
@@ -728,17 +728,16 @@ app.get('/post/:id', async (req, res) => {
     `,[numuser])
 
     if (typeof(visite) == typeof(unevariablenondéfinie)){
-      console.log("cas non definie, visite")
-      console.log(numuser + " id "+ id + " time: "+ Date.now())
+      //console.log("cas non definie, visite")
+      //console.log(numuser + " id "+ id + " time: "+ Date.now())
       const add_visite = await db.run(`
         INSERT INTO visite(user, article, date)
         VALUES(?, ?, ?)
       `,[numuser, id, Date.now()])
-      console.log(3)
     }
 
     else {
-      console.log("cas définie visite" + Date.now())
+      //console.log("cas définie visite" + Date.now())
       const update_visite = await db.run(`
         UPDATE visite
         SET date = ?
@@ -783,7 +782,7 @@ app.get('/post/:id', async (req, res) => {
       SELECT numcom FROM commentaires 
       WHERE article = ?
     `,[id])
-    console.log(post.auteur)
+    //console.log(post.auteur)
 
     const auteur= await db.get(`
       SELECT username FROM userdata
@@ -807,7 +806,7 @@ app.get('/post/:id', async (req, res) => {
     //console.log(commentaire2)
     for (let k = 0; k < commentaire_nb; k++){
       //console.log(commentaire[k])
-      console.log("numcom: "+ commentaire2[k].numcom)
+      //console.log("numcom: "+ commentaire2[k].numcom)
       commentaire_content[k]= commentaire[k].content
       commentaire_name[k]= commentaire[k].name
     }
@@ -999,8 +998,8 @@ app.get('/post/:id/edit', async (req, res) => {
       WHERE id = ?
     `,[id])
 
-    console.log("requete de : "+ iduser)
-    console.log(post)
+    //console.log("requete de : "+ iduser)
+    //console.log(post)
 
     if (post.auteur == iduser){
       res.render("post-edit",{post: post, categories: categories})
@@ -1041,8 +1040,8 @@ app.post('/post/:id/edit', async (req, res) => {
   `,[id])
 
   if (typeof(exist_date_post) == typeof(unevariablenondéfinie)){
-    console.log("cas non definie article")
-    console.log(" id "+ id + " time: "+ Date.now())
+    //console.log("cas non definie article")
+    //console.log(" id "+ id + " time: "+ Date.now())
     const add_update_post = await db.run(`
       INSERT INTO postupdate(article, date)
       VALUES(?, ?)
@@ -1050,7 +1049,7 @@ app.post('/post/:id/edit', async (req, res) => {
   }
 
   else {
-    console.log("Cas definie article:"+id+" date "+ Date.now())
+    //console.log("Cas definie article:"+id+" date "+ Date.now())
     const update_date_post = await db.run(`
       UPDATE postupdate
       SET lastupdate = ?
@@ -1095,15 +1094,17 @@ app.post('/category/:id/edit', async (req, res) => {
     res.redirect(302,'/login')
     return
   }
-  const name = req.body.name
-  const id = req.params.id
-  const db = await openDb()
-  const category = await db.get(`
-    UPDATE categories
-    SET cat_name = ?
-    WHERE cat_id = ?
-  `,[name,id])
-  res.redirect(302,'/categories')
+  else{
+    const name = req.body.name
+    const id = req.params.id
+    const db = await openDb()
+    const category = await db.run(`
+      UPDATE categories
+      SET cat_name = ?
+      WHERE cat_id = ?
+    `,[name ,id])
+    res.redirect(302,'/categories')
+  }
 })
 
 app.post('/category/:id/delete', async (req, res) => {
@@ -1149,7 +1150,7 @@ app.get('/:cat?', async (req, res) => {
     `, [categoryActive])
     }
     
-    console.log(posts)
+    //console.log(posts)
     let cur_date=[]
 
     if ( typeof(posts) == typeof(unevariablenondéfinie)){
