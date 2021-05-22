@@ -255,7 +255,6 @@ app.get('/tendance', async(req,res) =>{
       }
     }
 
-    console.log(posts)
     res.render("tendance",{posts: posts,categories: categories, logged: req.session.logged, numuser: req.session.numuser, date: cur_date})
   }
   else {
@@ -1123,26 +1122,59 @@ app.post('/category/:id/delete', async (req, res) => {
 
 
 app.get('/:cat?', async (req, res) => {
-  const db = await openDb()
-  const categoryActive = req.params.cat ? req.params.cat : 'home'
-  const categories = await db.all(`
-    SELECT * FROM categories
-  `)
-  const categoryObjectActive = categories.find(({cat_id}) => cat_id.toString() === categoryActive)
-  let posts = []
-  if(categoryActive === "home"){
-    posts = await db.all(`
-    SELECT * FROM posts
-    LEFT JOIN categories on categories.cat_id = posts.category
-  `)
-  } else {
-    posts = await db.all(`
+  if (req.session.logged){
+    const db = await openDb()
+
+    const categoryActive = req.params.cat ? req.params.cat : 'home'
+
+    const categories = await db.all(`
+      SELECT * FROM categories
+    `)
+
+    const categoryObjectActive = categories.find(({cat_id}) => cat_id.toString() === categoryActive)
+
+    let posts = []
+    if(categoryActive === "home"){
+      posts = await db.all(`
       SELECT * FROM posts
-      LEFT JOIN categories on categories.cat_id = posts.category
-      WHERE category = ?
-  `, [categoryActive])
+      INNER JOIN categories on categories.cat_id = posts.category
+      INNER JOIN userdata ON posts.auteur=userdata.id
+    `)
+    } else {
+      posts = await db.all(`
+        SELECT * FROM posts
+        INNER JOIN categories on categories.cat_id = posts.category
+        INNER JOIN userdata ON posts.auteur=userdata.id
+        WHERE category = ?
+    `, [categoryActive])
+    }
+    
+    console.log(posts)
+    let cur_date=[]
+
+    if ( typeof(posts) == typeof(unevariablenondéfinie)){
+      posts=[]
+    }
+    else {
+      let date =""
+      let jour = ""
+      let month = ""
+      let year = ""
+      for (let i = 0; i < posts.length; i++){
+        date_comp=new Date(posts[i].date_parution + 3600000).toString()//On met la date au bon crénaux horaire et en string
+        jour= date_comp[8] + date_comp[9]
+        month= date_comp[4]+ date_comp[5]+ date_comp[6]
+        year= date_comp[11] + date_comp[12]+ date_comp[13]+ date_comp[14]
+
+        cur_date[i] = jour+" "+month+" "+year
+      }
+    }
+    
+  res.render("blog",{categories: categories, categoryActive: categoryObjectActive, posts: posts, logged: req.session.logged, numuser: req.session.numuser, date: cur_date})
   }
-  res.render("blog",{categories: categories, categoryActive: categoryObjectActive, posts: posts, logged: req.session.logged, numuser: req.session.numuser})
+  else {
+    res.redirect('/login')
+  }
 })
 
 

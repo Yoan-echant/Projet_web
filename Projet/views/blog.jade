@@ -47,7 +47,7 @@ block body
             div.col
                 div.bg-light.p-5
                     div.container
-                        h1.text-center=categoryActive ? categoryActive.cat_name : "Edit commentaire"
+                        h1.text-center=categoryActive ? categoryActive.cat_name : "Acceuil"
         
         
         div.row.mt
@@ -72,8 +72,8 @@ block body
                                                         
                                                                 if !categoryActive
                                                                     span.badge.rounded-pill.bg-primary=posts[indexToSearch].cat_name
-                                                                span.badge.rounded-pill.bg-primary author
-                                                                span.badge.rounded-pill.bg-primary 01/01/01
+                                                                span.badge.rounded-pill.bg-primary= posts[indexToSearch].username
+                                                                span.badge.rounded-pill.bg-primary= date[indexToSearch]
                                                             
                                                             p=posts[indexToSearch].content
                                                             div.row
