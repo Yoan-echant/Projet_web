@@ -20,15 +20,6 @@ const sess = {
   saveUninitialized: true
 }
 
-const authentification = {
-  username: "username",
-  password: "password"
-}
-
-
-
-
-
 
 if (app.get('env') === 'production') {
   app.set('trust proxy', 1) // trust first proxy
