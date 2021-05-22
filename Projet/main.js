@@ -532,6 +532,7 @@ app.get('/post/:id', async (req, res) => {
   const db = await openDb()
   const id = req.params.id
   const numuser = req.session.numuser
+  const name=req.session.userdata
   const post = await db.get(`
     SELECT * FROM posts
     LEFT JOIN categories on categories.cat_id = posts.category
@@ -601,7 +602,8 @@ app.get('/post/:id', async (req, res) => {
   const data = {
     like:aviss.like,
     dislike:aviss.dislike,
-    useropinion: currentavis
+    useropinion: currentavis,
+    user: req.session.userdata
 }
 
   res.render("post",{post: post, numuser: numuser, logged: req.session.logged, data, commentaire_name, commentaire_content, commentaire_nb, array_com})
