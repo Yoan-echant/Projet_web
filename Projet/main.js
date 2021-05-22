@@ -417,7 +417,7 @@ app.get('/profile', async (req, res) => {
       logged: req.session.logged,
       date: cur_date
     }
-    console.log(post)
+    //console.log(post)
     res.render('profile', {data, categories: categories, posts: post})
   }
 })
@@ -576,7 +576,7 @@ app.get('/commentaire/:id/delete/:idcom', async (req, res) => {
 })
 
 app.get('/commentaire/:id/edit/:idcom', async (req, res) => {
-  if (req.params.logged){
+  if (req.session.logged){
     const id = req.params.id
     const iduser = req.session.numuser
     const idcom = req.params.idcom
