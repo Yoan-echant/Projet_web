@@ -26,6 +26,10 @@ block body
                                 option(value=cat.cat_id selected=(post.category === cat.cat_id))= cat.cat_name
                     div
                         textarea(id="content" name="content")=post.content
+                    
+                    div
+                        label(for="lien")
+                            input(type="lien" id="lien" name="lien" value=post.lien)
             div
                 input(type="Submit" value="Sauvegarder")
         div.row
