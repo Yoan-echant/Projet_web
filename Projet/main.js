@@ -229,7 +229,7 @@ app.get('/tendance', async(req,res) =>{
 
     let posts = []
     posts = await db.all(`
-      SELECT posts.id, posts.name, posts.content, posts.date_parution, userdata.username FROM posts
+      SELECT posts.id, posts.name, posts.content, posts.date_parution, userdata.username, posts.lien FROM posts
       INNER JOIN avis on avis.id = posts.id
       INNER JOIN userdata ON posts.auteur=userdata.id
       WHERE avis.commentaire = 0
@@ -287,7 +287,7 @@ app.get('/visite', async(req,res) =>{
 
     let posts = []
     posts = await db.all(`
-      SELECT posts.id, posts.name, posts.content, posts.date_parution, userdata.username FROM posts
+      SELECT posts.id, posts.name, posts.content, posts.date_parution, userdata.username, posts.lien FROM posts
       INNER JOIN visite ON visite.article = posts.id
       INNER JOIN postupdate ON postupdate.article = posts.id
       INNER JOIN userdata ON posts.auteur=userdata.id
@@ -385,7 +385,7 @@ app.get('/profile', async (req, res) => {
 
     let post =[]
     post= await db.all(`
-      SELECT posts.id, posts.name, posts.content, posts.date_parution, userdata.username FROM posts
+      SELECT posts.id, posts.name, posts.content, posts.date_parution, userdata.username, posts.lien FROM posts
       INNER JOIN visite ON visite.article = posts.id
       INNER JOIN userdata ON posts.auteur=userdata.id
       WHERE visite.user= ?
@@ -702,11 +702,12 @@ app.post('/post/create', async (req, res) => {
   const iduser = req.session.numuser
   const name = req.body.name
   const content = req.body.content
+  const lien = req.body.lien
   const category = req.body.category
   const post = await db.run(`
-    INSERT INTO posts(name, content, category, auteur, date_parution)
-    VALUES(?, ?, ?, ?, ?)
-  `,[name, content, category, iduser, Date.now()])
+    INSERT INTO posts(name, content, category, auteur, date_parution, lien)
+    VALUES(?, ?, ?, ?, ?, ?)
+  `,[name, content, category, iduser, Date.now(), lien])
   //console.log("post create post : ")
   //console.log(post)
   res.redirect("/post/" + post.lastID)
@@ -1231,13 +1232,13 @@ app.get('/:cat?', async (req, res) => {
     let posts = []
     if(categoryActive === "home"){
       posts = await db.all(`
-      SELECT posts.id, posts.name, posts.content, posts.date_parution, userdata.username, categories.cat_name FROM posts
+      SELECT posts.id, posts.name, posts.content, posts.date_parution, userdata.username, categories.cat_name, posts.lien FROM posts
       INNER JOIN categories on categories.cat_id = posts.category
       INNER JOIN userdata ON userdata.id=posts.auteur
     `)
     } else {
       posts = await db.all(`
-        SELECT posts.id, posts.name, posts.content, posts.date_parution, userdata.username, categories.cat_name FROM posts
+        SELECT posts.id, posts.name, posts.content, posts.date_parution, userdata.username, categories.cat_name, posts.lien FROM posts
         INNER JOIN categories on categories.cat_id = posts.category
         INNER JOIN userdata ON userdata.id=posts.auteur
         WHERE category = ?
