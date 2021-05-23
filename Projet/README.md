@@ -25,7 +25,7 @@ La page de connexion dipose d'un lien vers la page de création de compte
 On peut créer de nouveaux comptes, le mot de passe doit etre > a 6 caractères, l'username superieur a 4 et l'adresse mail doit être valide
 
 On peut ajouter des pages, et editer et supprimer les pages qu'on a créer. Il n'est pas possible de supprimer ou d'editer des pages.
-Chaque page dispose egalement d'un lien
+Chaque page dispose egalement d'un lien editable.
 
 On peut se rendre sur chaque page.
 La catégorie, l'auteur et la date de parution (ou de dernière edition si edition il y a eu) sont affichée sur le site
@@ -35,7 +35,7 @@ Chaque personne ne peut liker ou disliker qu'une seul fois. On ne peut pas liker
 On peut voir le choix que l'on a fait ainsi que le nombre total de like/dislike.
 
 Il est possible de commenter une page.
-Chaque utilisateur peut editer/supprimer son commentaire a tout moment.
+Chaque utilisateur peut editer/supprimer ses commentaires a tout moment (mais pas ceux des autres).
 
 Chaque utilisateur dispose d'une page de profile.
 Il est possible d'y changer son mot de passe
