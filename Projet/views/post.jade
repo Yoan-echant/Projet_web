@@ -50,7 +50,7 @@ block body
                .card   
                     .card-header
                         span.badge.rounded-pill.bg-primary=post.cat_name
-                        span.badge.rounded-pill.bg-secondary= data.user
+                        span.badge.rounded-pill.bg-secondary= data.auteur
                         span.badge.rounded-pill.bg-secondary= data.date
                     .card-body
                         p=post.content
@@ -103,7 +103,7 @@ block body
                                     .card.bg-dark.text-white
                                         .card-header
                                             .p-2  
-                                                p= " Nom d'Utilisateur : " + data.user
+                                                p= " Nom d'Utilisateur : " + data.user[idcom-1].username
                                                 p='Objet : '  + commentaire_name[idcom-1]
                                         .card-body
                                             .p-2      

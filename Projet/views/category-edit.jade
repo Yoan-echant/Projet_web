@@ -19,6 +19,11 @@ block body
                         input(value=category.cat_name id="name" name="name")
                 div
                     input(type="Submit" value="Sauvegarder")
-            div.row
-                form(action="/category/" + category.cat_id + "/delete" method="POST")
-                    input(type="Submit" value="Delete")
+        
+        
+        div.row
+            form(action="/category/" + category.cat_id + "/delete" method="POST")
+                input(type="Submit" value="Delete")
+        div.row
+            form(action="/categories" method="GET")
+                input(type="Submit" value="Annuler")

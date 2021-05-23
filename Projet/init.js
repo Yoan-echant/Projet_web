@@ -214,7 +214,6 @@ async function createTables(db){
           category int,
           content text,
           lien text,
-          article int,
           auteur int,
           date_parution int,
           FOREIGN KEY(category) REFERENCES categories(cat_id),

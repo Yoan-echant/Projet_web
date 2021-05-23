@@ -17,3 +17,11 @@ block body
                 each cat, index in categories
                   li
                     a(href="/category/" + cat.cat_id class="link-dark")=cat.cat_name
+                
+                
+        div.row.mt-5
+            div.col        
+                div.row
+                  form(action="/categories/create" method="GET")
+                    p=wtf
+                    input(type="Submit" value="Create a new categorie")

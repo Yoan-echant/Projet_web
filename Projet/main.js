@@ -229,7 +229,7 @@ app.get('/tendance', async(req,res) =>{
 
     let posts = []
     posts = await db.all(`
-      SELECT * FROM posts
+      SELECT posts.id, posts.name, posts.content, posts.date_parution, userdata.username FROM posts
       INNER JOIN avis on avis.id = posts.id
       INNER JOIN userdata ON posts.auteur=userdata.id
       WHERE avis.commentaire = 0
@@ -287,7 +287,7 @@ app.get('/visite', async(req,res) =>{
 
     let posts = []
     posts = await db.all(`
-      SELECT * FROM posts
+      SELECT posts.id, posts.name, posts.content, posts.date_parution, userdata.username FROM posts
       INNER JOIN visite ON visite.article = posts.id
       INNER JOIN postupdate ON postupdate.article = posts.id
       INNER JOIN userdata ON posts.auteur=userdata.id
@@ -385,7 +385,7 @@ app.get('/profile', async (req, res) => {
 
     let post =[]
     post= await db.all(`
-      SELECT * FROM posts
+      SELECT posts.id, posts.name, posts.content, posts.date_parution, userdata.username FROM posts
       INNER JOIN visite ON visite.article = posts.id
       INNER JOIN userdata ON posts.auteur=userdata.id
       WHERE visite.user= ?
@@ -533,7 +533,7 @@ app.post('/commentaire/:id', async (req, res) => {
       //console.log("cas non definie article")
       //console.log(" id "+ id + " time: "+ Date.now())
       const add_update_post = await db.run(`
-        INSERT INTO postupdate(article, date)
+        INSERT INTO postupdate(article, lastupdate)
         VALUES(?, ?)
       `,[id, Date.now()])
     }
@@ -779,17 +779,32 @@ app.get('/post/:id', async (req, res) => {
       WHERE article = ?
     `,[id]) 
 
-    const commentaire2 = await db.all(`
-      SELECT numcom FROM commentaires 
-      WHERE article = ?
+    let auteur = await db.get(`
+      SELECT username FROM userdata
+      INNER JOIN posts ON userdata.id = posts.auteur
+      WHERE posts.id = ?
+    `,[id]) 
+    console.log(commentaire)
+    
+    let commentaire_auteur = await db.all(`
+      SELECT username FROM userdata
+      INNER JOIN commentaires ON commentaires.iduser = userdata.id
+      WHERE commentaires.article = ?
     `,[id])
+    //console.log(commentaire_auteur)
     //console.log(post.auteur)
 
-    const auteur= await db.get(`
-      SELECT username FROM userdata
-      WHERE id = ?
-    `,[post.auteur])
+    if (typeof(commentaire_auteur) == typeof(unevariablenondéfinie)){
+      commentaire_auteur={
+        username: "anonyme"
+      }
+    }
 
+    if (typeof(auteur) == typeof(unevariablenondéfinie)){
+      auteur={
+        username: "anonyme"
+      }
+    }
 
     let currentavis = 0
     if (typeof(aviuser) == typeof(unevariablenondéfinie)){
@@ -835,10 +850,10 @@ app.get('/post/:id', async (req, res) => {
       like:aviss.like,
       dislike:aviss.dislike,
       useropinion: currentavis,
-      user: auteur.username,
+      auteur: auteur.username,
+      user: commentaire_auteur,
       date: cur_date
     }
-
     res.render("post",{post: post, numuser: numuser, logged: req.session.logged, data, commentaire_name, commentaire_content, commentaire_nb, array_com})
   } 
 })
@@ -1081,13 +1096,22 @@ app.get('/category/:id', async (req, res) => {
     res.redirect(302,'/login')
     return
   }
-  const id = req.params.id
-  const db = await openDb()
-  const category = await db.get(`
-    SELECT * FROM categories
-    WHERE cat_id = ?
-  `,[id])
-  res.render("category-edit", {category})
+  else{
+    console.log("WTF!")
+    const id = req.params.id
+    const db = await openDb()
+    let category = await db.get(`
+      SELECT * FROM categories
+      WHERE cat_id = ?
+    `,[id])
+    if(typeof(category)==typeof(unevariablenondéfinie)){
+      category = {
+        cat_id: 0,
+        cat_name: "",
+      }
+    }
+    res.render("category-edit", {category: category})
+  }
 })
 
 app.post('/category/:id/edit', async (req, res) => {
@@ -1095,7 +1119,9 @@ app.post('/category/:id/edit', async (req, res) => {
     res.redirect(302,'/login')
     return
   }
+  
   else{
+    console.log("Hello!")
     const name = req.body.name
     const id = req.params.id
     const db = await openDb()
@@ -1119,9 +1145,76 @@ app.post('/category/:id/delete', async (req, res) => {
     DELETE FROM categories
     WHERE cat_id = ?
   `,[id])
-  res.redirect(302,'/categories')
+  res.redirect('/categories')
 })
 
+
+app.get('/categories/create', async (req, res) => {
+  if(!req.session.logged){
+    res.redirect(302,'/login')
+    return
+  }
+  else{
+    console.log("Hey!")
+    const db = await openDb()
+    const categories = await db.all(`
+      SELECT * FROM categories
+    `,)
+    let cat_nb=0
+    if (typeof(categories) != typeof(unevariablenondéfinie)){
+      cat_nb=categories.length
+    }
+    data={
+      logged: req.session.logged
+    }
+    res.render('category-create',{category: categories, data})
+  }
+})
+
+
+app.post('/categories/create', async (req, res) => {
+  if(!req.session.logged){
+    res.redirect(302,'/login')
+  }
+  else{
+    console.log("coucou")
+    cat_name=req.body.cat_name
+    const db = await openDb()
+    const categories = await db.all(`
+      SELECT cat_name FROM categories
+    `)
+    console.log(categories)
+    let test = 0
+    if (typeof(categories) == typeof(unevariablenondéfinie)){
+      test = 1
+      console.log("Cat etait vide")
+      const categories_add = await db.run(`
+        INSERT INTO categories(cat_name)
+        VALUES(?)
+    `,[cat_name])
+    res.redirect('/categories')
+    }
+    else{
+      for (let i = 0; i < categories.length; i++){
+        if (cat_name== categories[i].cat_name){
+          test = 1
+          data= {
+            errors: "Cette catégorie existe déja",
+            logged: req.session.logged
+          }
+          res.render('category-create', data)
+        }
+      }
+    }
+    if (test ==0){
+      const categories = await db.run(`
+        INSERT INTO categories(cat_name)
+        VALUES(?)
+      `,[cat_name])
+      res.redirect('/categories')
+    }
+  }
+})
 
 app.get('/:cat?', async (req, res) => {
   if (req.session.logged){
@@ -1138,22 +1231,22 @@ app.get('/:cat?', async (req, res) => {
     let posts = []
     if(categoryActive === "home"){
       posts = await db.all(`
-      SELECT * FROM posts
+      SELECT posts.id, posts.name, posts.content, posts.date_parution, userdata.username, categories.cat_name FROM posts
       INNER JOIN categories on categories.cat_id = posts.category
-      INNER JOIN userdata ON posts.auteur=userdata.id
+      INNER JOIN userdata ON userdata.id=posts.auteur
     `)
     } else {
       posts = await db.all(`
-        SELECT * FROM posts
+        SELECT posts.id, posts.name, posts.content, posts.date_parution, userdata.username, categories.cat_name FROM posts
         INNER JOIN categories on categories.cat_id = posts.category
-        INNER JOIN userdata ON posts.auteur=userdata.id
+        INNER JOIN userdata ON userdata.id=posts.auteur
         WHERE category = ?
     `, [categoryActive])
     }
     
     //console.log(posts)
     let cur_date=[]
-
+    
     if ( typeof(posts) == typeof(unevariablenondéfinie)){
       posts=[]
     }
@@ -1172,7 +1265,8 @@ app.get('/:cat?', async (req, res) => {
       }
     }
     
-  res.render("blog",{categories: categories, categoryActive: categoryObjectActive, posts: posts, logged: req.session.logged, numuser: req.session.numuser, date: cur_date})
+    
+    res.render("blog",{categories: categories, categoryActive: categoryObjectActive, posts: posts, logged: req.session.logged, numuser: req.session.numuser, date: cur_date})
   }
   else {
     res.redirect('/login')
