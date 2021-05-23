@@ -47,9 +47,9 @@ block body
                                 h4=data.erreur
                         img(src="https://static.jobat.be/uploadedImages/grandprofilfb.jpg"  style="width:300px; height:200px")
                         .p-2
-                            p="Votre nom d'utilisateur est:" + data.username
+                            p="Votre nom d'utilisateur est : "  + data.username
                         .p-2 
-                            p= "Votre adresse mail est:" + data.mail
+                            p= "Votre adresse mail est : " + data.mail
                         .p-2 
                             h4= "Changer de mot de passe:" 
                         form(method="POST" action="/changemdp")
@@ -66,7 +66,7 @@ block body
                                 form(method="POST" action="/changemdp")
                                     input(type="submit" value="Changer de mot de passe")
 
-
+                             h1="Voici les articles que vous avez visité recemment : "
         div.row.mt
             div.col
                 .bg-light

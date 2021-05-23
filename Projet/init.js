@@ -15,13 +15,13 @@ async function createCategories(db){
 async function createUserdata(db){
   const insertRequest = await db.prepare("INSERT INTO userdata(username, password, mail) VALUES(?, ?, ?)")
   const data = [{
-    username:"username",
-    password: "password",
+    username:"max",
+    password: "max",
     mail: "username@adressemail.pif"
    },
     {
-     username:"admin",
-     password: "admin",
+     username:"bob",
+     password: "bob",
      mail: "admin@adressemail.pif"
     }
   ]
@@ -83,7 +83,7 @@ async function createCommentaire(db){
       name: "réponse",
       content: "t'as raison",
       article: 1,
-      iduser: 2,
+      iduser: 1,
       numcom: 2,
     }, 
     {
