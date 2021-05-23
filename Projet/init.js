@@ -114,31 +114,35 @@ async function createCommentaire(db){
 }
 
 async function createAvis(db){
-  const insertRequest = await db.prepare("INSERT INTO avis(dislike, like, article) VALUES(?, ?, ?)")
+  const insertRequest = await db.prepare("INSERT INTO avis(dislike, like, article, commentaire) VALUES(?, ?, ?, ?)")
   const avis = [{
     dislike: 3,
     like: 88,
-    article: 1
+    article: 1,
+    commentaire: 0,
   }, 
   {
     dislike: 7,
     like: 22,
-    article: 2
+    article: 2,
+    commentaire: 0,
   }, 
   {
     dislike: 0,
     like: 261,
-    article: 3
+    article: 3,
+    commentaire: 0,
   }, 
   {
     dislike: 2,
     like: 23,
-    article: 4
+    article: 4,
+    commentaire: 0,
     
   }
   ]
   return await Promise.all( avis.map(av => {
-    return insertRequest.run([av.dislike, av.like, av.article])
+    return insertRequest.run([av.dislike, av.like, av.article, av.commentaire])
   }))
 }
 
@@ -244,6 +248,7 @@ async function createTables(db){
           dislike int,
           like int,
           article int,
+          commentaire int,
           FOREIGN KEY(article) REFERENCES post(id)
         )
 `)

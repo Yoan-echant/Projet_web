@@ -232,6 +232,7 @@ app.get('/tendance', async(req,res) =>{
       SELECT * FROM posts
       INNER JOIN avis on avis.id = posts.id
       INNER JOIN userdata ON posts.auteur=userdata.id
+      WHERE avis.commentaire = 0
       ORDER BY like DESC
     `)
     
@@ -386,12 +387,11 @@ app.get('/profile', async (req, res) => {
     post= await db.all(`
       SELECT * FROM posts
       INNER JOIN visite ON visite.article = posts.id
-      INNER JOIN postupdate ON postupdate.article = posts.id
       INNER JOIN userdata ON posts.auteur=userdata.id
       WHERE visite.user= ?
       ORDER BY visite.date DESC
     `,[iduser])
-
+    console.log(post)
     let cur_date=[]
 
     if ( typeof(post) == typeof(unevariablenondéfinie)){
@@ -725,8 +725,8 @@ app.get('/post/:id', async (req, res) => {
 
     const visite = await db.get(`
       SELECT * FROM visite
-      WHERE user = ?
-    `,[numuser])
+      WHERE user = ? AND article = ?
+    `,[numuser, id])
 
     if (typeof(visite) == typeof(unevariablenondéfinie)){
       //console.log("cas non definie, visite")
@@ -754,19 +754,19 @@ app.get('/post/:id', async (req, res) => {
     
     let aviss = await db.get(`
       SELECT like,dislike  FROM avis
-      WHERE article = ?
+      WHERE article = ? AND commentaire = 0
     `,[id])
     
     if (
       typeof(aviss)==typeof(unevariablenondéfinie)
       ){
         const newavis= await db.run(`
-          INSERT INTO avis(like, dislike, article)
-          VALUES(?, ?, ?)
-        `,[0, 0, id])
+          INSERT INTO avis(like, dislike, article, commentaire)
+          VALUES(?, ?, ?, ?)
+        `,[0, 0, id, 0])
         aviss = await db.get(`
         SELECT like,dislike  FROM avis
-        WHERE article = ?
+        WHERE article = ? AND commentaire = 0
       `,[id])
     }
     const aviuser = await db.get(`
@@ -852,7 +852,7 @@ app.post('/like/:id', async (req, res) => {
   if (logged){
     const aviss = await db.get(`
       SELECT like,dislike  FROM avis
-      WHERE id = ?
+      WHERE id = ? AND commentaire = 0
     `,[id])
     let nblike = aviss.like +1
 
@@ -872,7 +872,7 @@ app.post('/like/:id', async (req, res) => {
         const avis2s = await db.get(`
           UPDATE avis
           SET dislike = ?
-          WHERE id = ? 
+          WHERE id = ? AND commentaire = 0
         `,[ aviss.dislike-1 , id])
         const avisuser = await db.get(`
           UPDATE liketab
@@ -899,7 +899,7 @@ app.post('/like/:id', async (req, res) => {
     const avis2s = await db.get(`
       UPDATE avis
       SET like = ?
-      WHERE id = ? 
+      WHERE id = ? AND commentaire = 0
     `,[ nblike, id])
 
   } 
@@ -919,7 +919,7 @@ app.get('/dislike/:id', async (req, res) => {
     if (logged) {
     const aviss = await db.get(`
       SELECT like,dislike  FROM avis
-      WHERE id = ?
+      WHERE id = ? AND commentaire = 0
     `,[id])
     let nbdis= aviss.dislike+1
     const aviuserprecedent = await db.get(`
@@ -942,7 +942,7 @@ app.get('/dislike/:id', async (req, res) => {
         const avis2s = await db.get(`
           UPDATE avis
           SET like = ?
-          WHERE id = ? 
+          WHERE id = ? AND commentaire = 0
         `,[ aviss.like-1 , id])
         const avisuser = await db.get(`
           UPDATE liketab
@@ -970,7 +970,7 @@ app.get('/dislike/:id', async (req, res) => {
     const avis2s = await db.get(`
       UPDATE avis
       SET dislike = ?
-      WHERE id = ? 
+      WHERE id = ? AND commentaire = 0
     `,[nbdis , id])
     //console.log(req.body.like);s
   }
