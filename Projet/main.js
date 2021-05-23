@@ -993,12 +993,13 @@ app.post('/post/:id/edit', async (req, res) => {
     const name = req.body.name
     const content = req.body.content
     const category = req.body.category
+    const lien = req.body.lien
 
     const post_update=await db.run(`
       UPDATE posts
-      SET name = ?, content = ?, category = ?
+      SET name = ?, content = ?, category = ?, lien= ?
       WHERE id = ?
-    `,[name, content, category, id])
+    `,[name, content, category, lien, id])
 
     const date_update = await db.run(`
       UPDATE posts
