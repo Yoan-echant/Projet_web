@@ -229,7 +229,7 @@ app.get('/tendance', async(req,res) =>{
 
     let posts = []
     posts = await db.all(`
-      SELECT posts.id, posts.name, posts.content, posts.date_parution, userdata.username, posts.lien FROM posts
+      SELECT posts.id, posts.name, posts.content, posts.date_parution, userdata.username, posts.lien, avis.like, avis.dislike FROM posts
       INNER JOIN avis on avis.id = posts.id
       INNER JOIN userdata ON posts.auteur=userdata.id
       WHERE avis.commentaire = 0
@@ -287,10 +287,11 @@ app.get('/visite', async(req,res) =>{
 
     let posts = []
     posts = await db.all(`
-      SELECT posts.id, posts.name, posts.content, posts.date_parution, userdata.username, posts.lien FROM posts
+      SELECT posts.id, posts.name, posts.content, posts.date_parution, userdata.username, posts.lien, avis.like, avis.dislike FROM posts
       INNER JOIN visite ON visite.article = posts.id
       INNER JOIN postupdate ON postupdate.article = posts.id
       INNER JOIN userdata ON posts.auteur=userdata.id
+      INNER JOIN avis ON avis.article=posts.id
       WHERE visite.user= ? AND postupdate.lastupdate > visite.date AND visite.date + 86400000 > ?
     `,[numerouser, Date.now()])
 
@@ -385,9 +386,10 @@ app.get('/profile', async (req, res) => {
 
     let post =[]
     post= await db.all(`
-      SELECT posts.id, posts.name, posts.content, posts.date_parution, userdata.username, posts.lien FROM posts
+      SELECT posts.id, posts.name, posts.content, posts.date_parution, userdata.username, posts.lien, avis.like, avis.dislike FROM posts
       INNER JOIN visite ON visite.article = posts.id
       INNER JOIN userdata ON posts.auteur=userdata.id
+      INNER JOIN avis ON avis.id=posts.id
       WHERE visite.user= ?
       ORDER BY visite.date DESC
     `,[iduser])
