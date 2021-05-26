@@ -14,6 +14,12 @@ Pour lancer le serveur  :
 node main.js
 ```
 
+
+ATTENTION
+
+Il faut se rendre sur la testmerge!!!!!
+(tout les fichier n'ont pas été ajouter dans le main)
+
 Fonctionnalité:
 
 Implémenté:
